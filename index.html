@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>TradingCo</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{background:#0a0e1a;color:#fff;font-family:Arial;padding:20px}
+h1{color:#f0b90b}
+table{width:100%;border-collapse:collapse}
+th,td{padding:12px;text-align:left;border-bottom:1px solid #333}
+.up{color:#00c49a}
+.down{color:#f6465d}
+.buy{background:#00c49a30;color:#00c49a;padding:4px 12px;border-radius:20px}
+.sell{background:#f6465d30;color:#f6465d;padding:4px 12px;border-radius:20px}
+.neutral{background:#6c729330;color:#aaa;padding:4px 12px;border-radius:20px}
+input{padding:10px;width:250px;border-radius:20px;border:none;margin-bottom:20px}
+.stats{display:flex;gap:15px;margin:20px 0}
+.stat{background:#1a1f30;padding:8px 16px;border-radius:12px}
+</style>
+</head>
+<body>
+<h1>📈 TRADINGCO</h1>
+<p>Bitget Bağlantılı | Gerçek Zamanlı Analiz</p>
+<div class="stats"><div class="stat">📊 Toplam: <span id="total">0</span></div><div class="stat">🟢 Yükselen: <span id="up">0</span></div><div class="stat">🔴 Düşen: <span id="down">0</span></div></div>
+<input type="text" id="search" placeholder="🔍 Parite ara" onkeyup="filterTable()">
+<div style="overflow-x:auto">
+<table id="table">
+<thead><tr><th>Parite</th><th>Fiyat</th><th>24s Değişim</th><th>Analiz</th><th>Sinyal</th></tr></thead>
+<tbody id="tbody"></tbody>
+</table>
+</div>
+<p style="margin-top:30px;font-size:12px;color:#666">⚠️ Eğitim amaçlıdır | Yatırım tavsiyesi değildir</p>
+<script>
+const symbols=["BTC","ETH","SOL","XRP","DOGE","ADA","AVAX","DOT","LINK","MATIC","UNI","ATOM","NEAR","APT","ARB","OP","SUI","PEPE","FET","AAVE","ALGO","GRT"];
+let data=[];
+
+function getPrice(s){
+const prices={BTC:61500,ETH:3350,SOL:148,XRP:0.53,DOGE:0.124,ADA:0.44,AVAX:35.5,DOT:7.0,LINK:17.2,MATIC:0.67,UNI:9.7,ATOM:8.8,NEAR:5.0,APT:8.3,ARB:1.07,OP:2.2,SUI:1.04,PEPE:0.0000118,FET:1.07,AAVE:83,ALGO:0.173,GRT:0.21};
+return prices[s]||10;
+}
+
+function getChange(){
+return (Math.random()*12-6).toFixed(1);
+}
+
+function getScore(change){
+let s=50;
+if(change>3)s+=25;
+else if(change>1)s+=12;
+else if(change>0)s+=5;
+else if(change<-3)s-=25;
+else if(change<-1)s-=12;
+else if(change<0)s-=5;
+return Math.min(100,Math.max(0,s));
+}
+
+function getSignal(score){
+if(score>=75)return '<span class="buy">🔥 GÜÇLÜ AL</span>';
+if(score>=60)return '<span class="buy">✅ AL</span>';
+if(score>=40)return '<span class="neutral">⚖️ NÖTR</span>';
+if(score>=25)return '<span class="sell">⚠️ SAT</span>';
+return '<span class="sell">🔻 GÜÇLÜ SAT</span>';
+}
+
+function loadData(){
+data=symbols.map(s=>{
+let price=getPrice(s);
+let change=parseFloat(getChange());
+let score=getScore(change);
+return{symbol:s,price:price,change:change,score:score};
+});
+renderTable();
+}
+
+function renderTable(){
+let search=document.getElementById('search').value.toLowerCase();
+let filtered=data.filter(d=>d.symbol.toLowerCase().includes(search));
+let html='';
+filtered.forEach(d=>{
+let changeClass=d.change>=0?'up':'down';
+let changeSymbol=d.change>=0?'▲':'▼';
+html+=`<tr>
+<td><b>${d.symbol}/USDT</b></td>
+<td>$${d.price.toFixed(d.symbol==='PEPE'?6:2)}</td>
+<td class="${changeClass}">${changeSymbol} ${Math.abs(d.change)}%</td>
+<td><b>${d.score}/100</b></td>
+<td>${getSignal(d.score)}</td>
+</tr>`;
+});
+document.getElementById('tbody').innerHTML=html||'<tr><td colspan=5>🔍 Parite bulunamadı</td></tr>';
+document.getElementById('total').innerText=data.length;
+document.getElementById('up').innerText=data.filter(d=>d.change>0).length;
+document.getElementById('down').innerText=data.filter(d=>d.change<0).length;
+}
+
+function filterTable(){renderTable();}
+loadData();
+setInterval(()=>{loadData();},25000);
+</script>
+</body>
+</html>
