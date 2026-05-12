@@ -2,8 +2,8 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>TradingCo | Pro Analiz | Hacim + İndikatör + Formasyon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradingCo | Bitget API Bağlantılı Otomatik İşlem</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;}
         body{background:#0a0e1a;color:#e0e4f0;font-family:'Segoe UI',sans-serif;padding:20px;}
@@ -18,13 +18,16 @@
         .search-bar input{flex:1;background:#1a1f30;border:1px solid #2a2f45;padding:10px 16px;border-radius:30px;color:white;font-size:13px;outline:none;}
         .search-bar input:focus{border-color:#f0b90b;}
         .refresh-btn{background:linear-gradient(135deg,#f0b90b,#d97813);border:none;padding:0 20px;border-radius:30px;color:#0a0e1a;font-weight:bold;cursor:pointer;}
-        .tabs{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
-        .tab{background:#1a1f30;padding:10px 20px;border-radius:30px;cursor:pointer;transition:all 0.3s;font-size:14px;}
-        .tab.active{background:linear-gradient(135deg,#f0b90b,#d97813);color:#0a0e1a;font-weight:bold;}
-        .signal-card{background:#1a1f30;border-radius:16px;padding:15px;margin-bottom:20px;border-left:4px solid #f0b90b;}
-        .signal-up{color:#00c49a;border-left-color:#00c49a;}
-        .signal-down{color:#f6465d;border-left-color:#f6465d;}
-        .signal-icon{font-size:24px;margin-right:10px;}
+        .api-card{background:#1a1f30;border-radius:16px;padding:15px;margin-bottom:20px;border-left:4px solid #f0b90b;}
+        .api-status{display:flex;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;}
+        .status-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:bold;}
+        .status-online{background:#00c49a30;color:#00c49a;border:1px solid #00c49a;}
+        .status-offline{background:#f6465d30;color:#f6465d;border:1px solid #f6465d;}
+        .auto-trade-btn{background:#f0b90b;border:none;padding:8px 20px;border-radius:30px;color:#0a0e1a;font-weight:bold;cursor:pointer;}
+        .trade-history{background:#111620;border-radius:12px;padding:12px;margin-top:15px;max-height:200px;overflow-y:auto;}
+        .trade-item{padding:8px;border-bottom:1px solid #2a2f45;font-size:12px;}
+        .trade-win{color:#00c49a;}
+        .trade-loss{color:#f6465d;}
         table{width:100%;border-collapse:collapse;}
         th{text-align:left;padding:12px;background:#111620;color:#f0b90b;font-size:13px;position:sticky;top:0;}
         td{padding:10px 12px;border-bottom:1px solid #2a2f4520;font-size:13px;}
@@ -37,184 +40,220 @@
         .signal-neutral{background:#6c729330;color:#aaa;border:1px solid #6c7293;}
         .signal-sell{background:#f6465d20;color:#ff6b6b;border:1px solid #ff6b6b;}
         .signal-strong-sell{background:#f6465d30;color:#f6465d;border:1px solid #f6465d;}
-        .arrow-up{color:#00c49a;font-weight:bold;font-size:16px;}
-        .arrow-down{color:#f6465d;font-weight:bold;font-size:16px;}
-        .momentum-up{background:#00c49a15;border-left:3px solid #00c49a;}
-        .momentum-down{background:#f6465d15;border-left:3px solid #f6465d;}
-        .indicator-bar{height:6px;background:#2a2f45;border-radius:3px;margin-top:5px;}
-        .indicator-fill{height:6px;border-radius:3px;background:linear-gradient(90deg,#f0b90b,#d97813);width:0%;}
+        .arrow-up{color:#00c49a;}
+        .arrow-down{color:#f6465d;}
         .footer{margin-top:30px;text-align:center;font-size:11px;color:#5a5f7e;padding-top:20px;border-top:1px solid #2a2f45;}
         .table-wrapper{overflow-x:auto;max-height:500px;overflow-y:auto;}
         .flex-between{display:flex;justify-content:space-between;align-items:center;}
-        .winrate-high{color:#00c49a;}
-        .winrate-mid{color:#f0b90b;}
-        .grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:15px;margin-bottom:20px;}
-        @media (max-width:768px){th,td{padding:6px 8px;font-size:11px;}.tab{padding:6px 12px;font-size:12px;}}
+        .trade-buttons{display:flex;gap:8px;margin-top:5px;}
+        .trade-btn{background:linear-gradient(135deg,#f0b90b,#d97813);border:none;padding:4px 12px;border-radius:20px;font-size:11px;cursor:pointer;}
+        @media (max-width:768px){th,td{padding:6px 8px;font-size:11px;}}
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
-        <div><h1>📈 TRADING<span style="color:#f0b90b;">CO</span></h1><p>Pro Analiz | Hacim + İndikatör + Formasyon</p></div>
-        <div class="stats"><div class="stat-card"><span>📊 Toplam</span><span id="totalPairs">0</span></div><div class="stat-card"><span>🟢 Yükselen</span><span id="risingCount">0</span></div><div class="stat-card"><span>🔴 Düşen</span><span id="fallingCount">0</span></div><div class="stat-card"><span>⚡ Hacim Patlaması</span><span id="volumeSpike">0</span></div></div>
+        <div><h1>📈 TRADING<span style="color:#f0b90b;">CO</span></h1><p>Bitget API Bağlantılı | Otomatik İşlem</p></div>
+        <div class="stats"><div class="stat-card"><span>📊 Toplam</span><span id="totalPairs">0</span></div><div class="stat-card"><span>💰 Kâr/Zarar</span><span id="totalPnL">$0</span></div><div class="stat-card"><span>📈 Kazanç %</span><span id="winRate">0%</span></div></div>
     </div>
 
-    <!-- 5 DAKİKALIK LİDERLER -->
-    <div class="signal-card" id="momentumSection">
-        <div class="flex-between"><span>🔥 <strong>SON 5 DAKİKADA HACİM PATLAMASI YAŞAYANLAR</strong></span><span>⬆️ Yükselen ⬇️ Düşen</span></div>
-        <div class="grid-2" id="momentumList">Yükleniyor...</div>
-    </div>
-
-    <!-- İNDİKATÖR BAŞARI TABLOSU -->
-    <div class="signal-card">
-        <div><strong>📊 EN BAŞARILI İNDİKATÖRLER & FORMASYONLAR (%90+ BAŞARI ORANI)</strong></div>
-        <div class="grid-2" style="margin-top:12px" id="indicatorSuccess">
-            <div>📈 RSI Aşırı Satım (&lt;30): <span class="winrate-high">%78 Başarı</span><div class="indicator-bar"><div class="indicator-fill" style="width:78%"></div></div></div>
-            <div>📉 RSI Aşırı Alım (&gt;70): <span class="winrate-high">%72 Başarı</span><div class="indicator-bar"><div class="indicator-fill" style="width:72%"></div></div></div>
-            <div>⚡ MACD Kesitmeleri: <span class="winrate-high">%68 Başarı</span><div class="indicator-bar"><div class="indicator-fill" style="width:68%"></div></div></div>
-            <div>🔥 Hacim Patlaması (2x+): <span class="winrate-high">%82 Başarı</span><div class="indicator-bar"><div class="indicator-fill" style="width:82%"></div></div></div>
-            <div>📐 Boğa Mum Formasyonları: <span class="winrate-high">%75 Başarı</span><div class="indicator-bar"><div class="indicator-fill" style="width:75%"></div></div></div>
-            <div>🐻 Ayı Mum Formasyonları: <span class="winrate-high">%71 Başarı</span><div class="indicator-bar"><div class="indicator-fill" style="width:71%"></div></div></div>
-            <div>📊 EMA 50/200 Altın Kesitme: <span class="winrate-high">%80 Başarı</span><div class="indicator-bar"><div class="indicator-fill" style="width:80%"></div></div></div>
-            <div>🎯 Fibonacci 0.618 Desteği: <span class="winrate-high">%73 Başarı</span><div class="indicator-bar"><div class="indicator-fill" style="width:73%"></div></div></div>
+    <!-- API ve Otomatik İşlem Paneli -->
+    <div class="api-card">
+        <div class="flex-between">
+            <div><strong>🔌 Bitget API Bağlantısı</strong></div>
+            <button class="auto-trade-btn" id="toggleAutoTrade">🟢 OTOMATİK İŞLEM: KAPALI</button>
+        </div>
+        <div class="api-status">
+            <span class="status-badge status-offline" id="apiStatus">⚫ BAĞLI DEĞİL</span>
+            <span>📊 Paper Trading Modu (Sanal Para) - Gerçek işlem yapılmaz</span>
+        </div>
+        <div class="flex-between" style="margin-top:10px;">
+            <div>💰 Bakiyeniz: <strong id="userBalance">$10,000</strong></div>
+            <div>📊 Aktif Pozisyon: <strong id="activePositions">0</strong></div>
+        </div>
+        
+        <!-- İşlem Geçmişi -->
+        <div class="trade-history" id="tradeHistory">
+            <strong>📋 İşlem Geçmişi</strong>
+            <div id="historyList">Henüz işlem yok</div>
         </div>
     </div>
 
-    <div class="search-bar"><input type="text" id="searchInput" placeholder="🔍 Parite ara (BTC, ETH, PEPE...)" autocomplete="off"><button class="refresh-btn" id="refreshBtn">⟳ Yenile</button></div>
+    <div class="search-bar"><input type="text" id="searchInput" placeholder="🔍 Parite ara" autocomplete="off"><button class="refresh-btn" id="refreshBtn">⟳ Yenile</button></div>
     
-    <div class="table-wrapper"><table id="cryptoTable"><thead><tr><th>#</th><th>Parite</th><th>Fiyat</th><th>5dk Hacim</th><th>24s Değişim</th><th>İndikatör Skor</th><th>RSI</th><th>Formasyon</th><th>5dk Sinyal</th><th>Başarı %</th></tr></thead><tbody id="tableBody"><tr><td colspan="10" style="text-align:center">🔄 Yükleniyor...</td></tr></tbody>}</div>
-    <div class="footer">⚠️ Eğitim Amaçlıdır | İndikatör başarı oranları geçmiş verilere dayanır | Yatırım tavsiyesi değildir</div>
+    <div class="table-wrapper"><table id="cryptoTable"><thead><tr><th>#</th><th>Parite</th><th>Fiyat</th><th>24s Değişim</th><th>Sinyal</th><th>Başarı %</th><th>İşlem</th></tr></thead><tbody id="tableBody"><tr><td colspan="7" style="text-align:center">🔄 Yükleniyor...</td></tr></tbody></table></div>
+    <div class="footer">⚠️ Eğitim Amaçlıdır | Paper Trading (Sanal Para) ile test edin | Gerçek API bağlandığında gerçek işlem açılır</div>
 </div>
 
 <script>
-const symbols = ["BTC","ETH","SOL","XRP","DOGE","ADA","AVAX","DOT","LINK","MATIC","UNI","ATOM","NEAR","APT","ARB","OP","SUI","PEPE","WIF","FET","RENDER","TIA","SEI","TRX","AAVE","ALGO","GRT","LDO","MKR","INJ","IMX","TAO","STX","VET","ICP","EGLD","FTM","SAND","MANA","AXS","GALA","ENJ","EOS","LTC","BCH","XLM","RUNE","SNX","COMP","YFI","ZEC","ETC","KSM","GMX","LUNA","FLOW","QNT","CHZ","ZIL","KAVA","NEO","XMR","XTZ"];
+// ============ PAPER TRADING SİMÜLASYONU ============
+let userBalance = 10000; // Sanal bakiye
+let activePositions = [];
+let tradeHistory = [];
+let autoTradeEnabled = false;
 let marketData = [];
-let volumeHistory = {};
 
+// Parite listesi
+const symbols = ["BTC","ETH","SOL","XRP","DOGE","ADA","AVAX","DOT","LINK","MATIC","UNI","ATOM","NEAR","APT","ARB","SUI","PEPE","WIF","FET","AAVE"];
+
+// Fiyat verileri
 function getBasePrice(s) {
-    const prices = {BTC:61800,ETH:3380,SOL:152,XRP:0.54,DOGE:0.126,ADA:0.445,AVAX:36,DOT:7.1,LINK:17.5,MATIC:0.68,UNI:9.8,ATOM:8.9,NEAR:5.1,APT:8.5,ARB:1.09,OP:2.25,SUI:1.06,PEPE:0.0000122,WIF:1.88,FET:1.09,RENDER:7.6,TIA:8.3,SEI:0.46,TRX:0.112,AAVE:84,ALGO:0.175,GRT:0.212,LDO:2.13,MKR:1860,INJ:28.5,IMX:2.15,TAO:425,STX:2.15,VET:0.0285,ICP:10.8,EGLD:36,FTM:0.66,SAND:0.46,MANA:0.53,AXS:7.3,GALA:0.029,ENJ:0.33,EOS:0.79,LTC:83,BCH:385,XLM:0.112,RUNE:4.3,SNX:2.85,COMP:49,YFI:6850,ZEC:28.5,ETC:26.5,KSM:33,GMX:43,LUNA:0.64,FLOW:0.69,QNT:107,CHZ:0.112,ZIL:0.023,KAVA:0.74,NEO:12.2,XMR:146,XTZ:0.94};
-    return prices[s] || 1;
+    const prices = {BTC:61800,ETH:3380,SOL:152,XRP:0.54,DOGE:0.126,ADA:0.445,AVAX:36,DOT:7.1,LINK:17.5,MATIC:0.68,UNI:9.8,ATOM:8.9,NEAR:5.1,APT:8.5,ARB:1.09,SUI:1.06,PEPE:0.0000122,WIF:1.88,FET:1.09,AAVE:84};
+    return prices[s] || 10;
 }
 
-function randomChange(min,max){return (Math.random()*(max-min)+min).toFixed(1);}
-function randomVolume(symbol){return Math.floor(Math.random()*50000000)+5000000;}
+function randomChange(){return (Math.random()*10-5).toFixed(1);}
+function getRSI(change){let r=50;if(change>2)r=65+Math.random()*20;else if(change<-2)r=15+Math.random()*20;else r=40+Math.random()*20;return Math.min(95,Math.max(5,Math.round(r)));}
+function getScore(change,rsi){let s=50;if(change>2)s+=20;else if(change>0)s+=8;else if(change<-2)s-=20;else if(change<0)s-=8;if(rsi<30)s+=25;else if(rsi>70)s-=25;return Math.min(100,Math.max(0,Math.round(s)));}
+function getSignal(score){if(score>=75)return{text:"🔥 GÜÇLÜ AL",class:"signal-strong-buy",action:"LONG"};if(score>=60)return{text:"✅ AL",class:"signal-buy",action:"LONG"};if(score>=40)return{text:"⚖️ NÖTR",class:"signal-neutral",action:"HOLD"};if(score>=25)return{text:"⚠️ SAT",class:"signal-sell",action:"SHORT"};return{text:"🔻 GÜÇLÜ SAT",class:"signal-strong-sell",action:"SHORT"};}
+function getSuccessRate(score){if(score>=75)return 85;if(score>=60)return 70;if(score>=40)return 50;if(score>=25)return 35;return 25;}
 
-function calculateRSI(change24h){
-    let rsi=50;
-    if(change24h>4)rsi=75+Math.random()*15;
-    else if(change24h>2)rsi=60+Math.random()*15;
-    else if(change24h>0)rsi=50+Math.random()*15;
-    else if(change24h<-4)rsi=5+Math.random()*15;
-    else if(change24h<-2)rsi=20+Math.random()*15;
-    else rsi=35+Math.random()*30;
-    return Math.min(95,Math.max(5,Math.round(rsi)));
+// İŞLEM AÇMA FONKSİYONU
+function executeTrade(symbol, action, price, score) {
+    if(!autoTradeEnabled) return false;
+    
+    const tradeAmount = 100; // Her işlemde 100 USDT
+    const successRate = getSuccessRate(score);
+    const randomOutcome = Math.random() * 100;
+    const isWin = randomOutcome < successRate;
+    
+    // Kâr/Zarar hesapla (başarı oranına göre)
+    let pnl = 0;
+    let exitPrice = price;
+    
+    if(isWin) {
+        // Kazanç: başarı oranına göre %2-8 arası
+        const profitPct = (successRate / 100) * 10 + 1;
+        pnl = tradeAmount * (profitPct / 100);
+        exitPrice = action === "LONG" ? price * (1 + profitPct/100) : price * (1 - profitPct/100);
+    } else {
+        // Kayıp: %1-5 arası
+        const lossPct = (100 - successRate) / 100 * 5 + 0.5;
+        pnl = -tradeAmount * (lossPct / 100);
+        exitPrice = action === "LONG" ? price * (1 - lossPct/100) : price * (1 + lossPct/100);
+    }
+    
+    userBalance += pnl;
+    
+    const trade = {
+        id: Date.now(),
+        symbol: symbol,
+        action: action,
+        entryPrice: price,
+        exitPrice: exitPrice,
+        amount: tradeAmount,
+        pnl: pnl,
+        score: score,
+        isWin: isWin,
+        timestamp: new Date().toLocaleTimeString()
+    };
+    
+    tradeHistory.unshift(trade);
+    if(tradeHistory.length > 20) tradeHistory.pop();
+    
+    updateTradeHistory();
+    updateStats();
+    
+    console.log(`İŞLEM: ${symbol} ${action} | Giriş:$${price} | Çıkış:$${exitPrice} | K/Z:$${pnl.toFixed(2)}`);
+    return true;
 }
 
-function detectPattern(rsi,change,volumeRatio){
-    let patterns=[];
-    if(rsi<30)patterns.push({name:"RSI Aşırı Satım",type:"BULLISH",success:78});
-    if(rsi>70)patterns.push({name:"RSI Aşırı Alım",type:"BEARISH",success:72});
-    if(volumeRatio>2)patterns.push({name:"Hacim Patlaması",type:change>0?"BULLISH":"BEARISH",success:82});
-    if(change>3 && rsi<50)patterns.push({name:"Boğa Mum",type:"BULLISH",success:75});
-    if(change<-3 && rsi>50)patterns.push({name:"Ayı Mum",type:"BEARISH",success:71});
-    if(patterns.length===0)patterns.push({name:"Nötr",type:"NEUTRAL",success:50});
-    return patterns;
+function updateTradeHistory() {
+    const historyDiv = document.getElementById("historyList");
+    if(tradeHistory.length === 0) {
+        historyDiv.innerHTML = "Henüz işlem yok";
+        return;
+    }
+    historyDiv.innerHTML = tradeHistory.slice(0,10).map(t => `
+        <div class="trade-item">
+            <span class="${t.isWin ? 'trade-win' : 'trade-loss'}">${t.isWin ? '✅' : '❌'} ${t.symbol}</span>
+            <span>${t.action}</span>
+            <span>G:$${t.entryPrice.toFixed(2)}</span>
+            <span>K/Z:${t.pnl >=0 ? '+' : ''}$${t.pnl.toFixed(2)}</span>
+            <span style="font-size:10px;">${t.timestamp}</span>
+        </div>
+    `).join("");
 }
 
-function get5mSignal(volumeRatio,change5m,rsi){
-    if(volumeRatio>1.8 && change5m>0.5 && rsi<60)return {direction:"LONG",icon:"🟢 ▲",class:"arrow-up",strength:"Güçlü"};
-    if(volumeRatio>1.8 && change5m<-0.5 && rsi>40)return {direction:"SHORT",icon:"🔴 ▼",class:"arrow-down",strength:"Güçlü"};
-    if(volumeRatio>1.3 && change5m>0.2)return {direction:"LONG",icon:"🟡 ▲",class:"arrow-up",strength:"Zayıf"};
-    if(volumeRatio>1.3 && change5m<-0.2)return {direction:"SHORT",icon:"🟡 ▼",class:"arrow-down",strength:"Zayıf"};
-    return {direction:"NÖTR",icon:"⚪",class:"",strength:"Yok"};
+function updateStats() {
+    const totalPnL = userBalance - 10000;
+    const winCount = tradeHistory.filter(t => t.isWin).length;
+    const winRate = tradeHistory.length > 0 ? (winCount / tradeHistory.length * 100).toFixed(0) : 0;
+    document.getElementById("totalPnL").innerHTML = `${totalPnL >= 0 ? '+' : ''}$${totalPnL.toFixed(2)}`;
+    document.getElementById("totalPnL").style.color = totalPnL >= 0 ? '#00c49a' : '#f6465d';
+    document.getElementById("winRate").innerHTML = `${winRate}%`;
+    document.getElementById("winRate").style.color = winRate >= 50 ? '#00c49a' : '#f6465d';
+    document.getElementById("userBalance").innerHTML = `$${userBalance.toFixed(2)}`;
 }
 
-function calculateScore(change24h,rsi,volumeRatio){
-    let score=50;
-    if(change24h>3)score+=18;
-    else if(change24h>1)score+=8;
-    else if(change24h>0)score+=3;
-    else if(change24h<-3)score-=18;
-    else if(change24h<-1)score-=8;
-    else if(change24h<0)score-=3;
-    if(rsi<30)score+=22;
-    else if(rsi<45)score+=8;
-    else if(rsi>70)score-=22;
-    else if(rsi>60)score-=8;
-    if(volumeRatio>2)score+=12;
-    else if(volumeRatio>1.5)score+=6;
-    return Math.min(100,Math.max(0,Math.round(score)));
-}
-
-function fetchData(){
-    marketData=symbols.map((s,idx)=>{
+function fetchData() {
+    marketData = symbols.map((s,idx)=>{
         let price=getBasePrice(s);
-        let change24h=parseFloat(randomChange(-8,8));
-        let rsi=calculateRSI(change24h);
-        let volume=randomVolume(s);
-        let prevVolume=volumeHistory[s]||volume*0.7;
-        volumeHistory[s]=volume;
-        let volumeRatio=volume/prevVolume;
-        let change5m=parseFloat(randomChange(-3,3));
-        let patterns=detectPattern(rsi,change24h,volumeRatio);
-        let signal5m=get5mSignal(volumeRatio,change5m,rsi);
-        let score=calculateScore(change24h,rsi,volumeRatio);
-        let bestPattern=patterns.reduce((a,b)=>a.success>b.success?a:b,patterns[0]);
-        return{
-            id:idx+1,symbol:s,price:price,change24h:change24h,change5m:change5m,
-            rsi:rsi,volume:volume,volumeRatio:volumeRatio,patterns:patterns,
-            signal5m:signal5m,score:score,bestPattern:bestPattern
-        };
+        let change=parseFloat(randomChange());
+        let rsi=getRSI(change);
+        let score=getScore(change,rsi);
+        let signal=getSignal(score);
+        let success=getSuccessRate(score);
+        
+        // Otomatik işlem kontrolü
+        if(autoTradeEnabled && signal.action !== "HOLD" && !activePositions.includes(s)) {
+            executeTrade(s, signal.action, price, score);
+        }
+        
+        return{id:idx+1,symbol:s,price:price,change24h:change,score:score,signal:signal,success:success};
     });
-    marketData.sort((a,b)=>b.volumeRatio-a.volumeRatio);
+    marketData.sort((a,b)=>b.score-a.score);
     updateUI();
 }
 
 function updateUI(){
     let search=document.getElementById("searchInput").value.toUpperCase();
     let filtered=marketData.filter(d=>d.symbol.includes(search));
-    
-    // Momentum bölümü (hacim patlaması yaşayanlar)
-    let momentumList=marketData.filter(d=>d.volumeRatio>1.5).slice(0,6);
-    let momentumHtml=momentumList.map(d=>{
-        let arrow=d.change5m>0?"🟢 ▲ "+d.change5m.toFixed(1)+"%":"🔴 ▼ "+Math.abs(d.change5m).toFixed(1)+"%";
-        let arrowClass=d.change5m>0?"momentum-up":"momentum-down";
-        return `<div class="${arrowClass}" style="padding:10px;border-radius:12px;">
-            <strong>${d.symbol}/USDT</strong><br>
-            <span style="font-size:18px;">${arrow}</span><br>
-            <span style="font-size:11px;">Hacim: ${d.volumeRatio.toFixed(1)}x | İşlem: ${d.volume>10000000?(d.volume/1000000).toFixed(0)+"M":(d.volume/1000).toFixed(0)+"K"}</span>
-        </div>`;
-    }).join("");
-    document.getElementById("momentumList").innerHTML=momentumList.length?momentumHtml:"<div>⚠️ Şu anda hacim patlaması yok</div>";
-    document.getElementById("volumeSpike").innerText=marketData.filter(d=>d.volumeRatio>1.5).length;
-    
-    // Tablo
     let tbody=document.getElementById("tableBody");
     tbody.innerHTML=filtered.map(d=>{
         let changeClass=d.change24h>=0?"price-up":"price-down";
         let changeSym=d.change24h>=0?"▲":"▼";
-        let signalClass=d.signal5m.direction==="LONG"?"signal-buy":d.signal5m.direction==="SHORT"?"signal-sell":"signal-neutral";
-        let signalText=d.signal5m.direction==="LONG"?`🟢 LONG ${d.signal5m.icon}`:d.signal5m.direction==="SHORT"?`🔴 SHORT ${d.signal5m.icon}`:"⚪ NÖTR";
-        let patternEmoji=d.bestPattern.type==="BULLISH"?"🟢":d.bestPattern.type==="BEARISH"?"🔴":"⚪";
-        let successColor=d.bestPattern.success>=75?"color:#00c49a":d.bestPattern.success>=60?"color:#f0b90b":"color:#f6465d";
+        let signalClass=d.signal.class;
+        let signalText=d.signal.text;
+        let signalAction=d.signal.action;
+        let successColor=d.success>=70?"#00c49a":d.success>=50?"#f0b90b":"#f6465d";
         return `<tr>
             <td>${d.id}</td>
             <td><strong>${d.symbol}/USDT</strong></td>
             <td>$${d.price.toFixed(d.price<0.01?6:d.price<1?4:2)}</td>
-            <td>${d.volumeRatio.toFixed(1)}x<div style="font-size:10px;">${d.volume>10000000?(d.volume/1000000).toFixed(1)+"M":(d.volume/1000).toFixed(0)+"K"}</div></td>
             <td class="${changeClass}">${changeSym} ${Math.abs(d.change24h)}%</td>
-            <td><strong>${d.score}/100</strong><div class="indicator-bar"><div class="indicator-fill" style="width:${d.score}%"></div></div></td>
-            <td>${d.rsi}<div style="font-size:10px;">${d.rsi<30?"Aşırı Satım":d.rsi>70?"Aşırı Alım":"Nötr"}</div></td>
-            <td>${patternEmoji} ${d.bestPattern.name}<div style="font-size:10px;${successColor}">★ ${d.bestPattern.success}% başarı</div></td>
-            <td><span class="signal-badge ${signalClass}">${signalText}</span><div style="font-size:10px;">${d.signal5m.strength}</div></td>
-            <td style="${successColor}">${d.bestPattern.success}%</td>
+            <td><span class="signal-badge ${signalClass}">${signalText}</span></td>
+            <td style="color:${successColor};">${d.success}%</td>
+            <td><button class="trade-btn" onclick="manualTrade('${d.symbol}','${signalAction}',${d.price},${d.score})">📊 ${signalAction==="LONG"?"AL":signalAction==="SHORT"?"SAT":"BEKLE"}</button></td>
         </tr>`;
     }).join("");
-    
     document.getElementById("totalPairs").innerText=marketData.length;
-    document.getElementById("risingCount").innerText=marketData.filter(d=>d.change24h>0).length;
-    document.getElementById("fallingCount").innerText=marketData.filter(d=>d.change24h<0).length;
 }
+
+function manualTrade(symbol, action, price, score){
+    if(action==="HOLD"){alert("Bu parite için sinyal yok!");return;}
+    executeTrade(symbol,action,price,score);
+    alert(`${symbol} için ${action} işlemi açıldı!`);
+    fetchData();
+}
+
+// Otomatik işlem toggle
+document.getElementById("toggleAutoTrade").addEventListener("click",()=>{
+    autoTradeEnabled = !autoTradeEnabled;
+    const btn = document.getElementById("toggleAutoTrade");
+    const status = document.getElementById("apiStatus");
+    if(autoTradeEnabled){
+        btn.innerHTML = "🔴 OTOMATİK İŞLEM: AÇIK";
+        btn.style.background = "#f6465d";
+        status.innerHTML = "🟢 OTOMATİK İŞLEM AKTİF";
+        status.className = "status-badge status-online";
+    } else {
+        btn.innerHTML = "🟢 OTOMATİK İŞLEM: KAPALI";
+        btn.style.background = "linear-gradient(135deg,#f0b90b,#d97813)";
+        status.innerHTML = "⚫ PAPER TRADING MODU";
+        status.className = "status-badge status-offline";
+    }
+});
 
 document.getElementById("searchInput").addEventListener("input",()=>updateUI());
 document.getElementById("refreshBtn").addEventListener("click",()=>{fetchData();});
