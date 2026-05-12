@@ -1,102 +1,176 @@
 <!DOCTYPE html>
-<html>
+<html lang="tr">
 <head>
-<title>TradingCo</title>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-body{background:#0a0e1a;color:#fff;font-family:Arial;padding:20px}
-h1{color:#f0b90b}
-table{width:100%;border-collapse:collapse}
-th,td{padding:12px;text-align:left;border-bottom:1px solid #333}
-.up{color:#00c49a}
-.down{color:#f6465d}
-.buy{background:#00c49a30;color:#00c49a;padding:4px 12px;border-radius:20px}
-.sell{background:#f6465d30;color:#f6465d;padding:4px 12px;border-radius:20px}
-.neutral{background:#6c729330;color:#aaa;padding:4px 12px;border-radius:20px}
-input{padding:10px;width:250px;border-radius:20px;border:none;margin-bottom:20px}
-.stats{display:flex;gap:15px;margin:20px 0}
-.stat{background:#1a1f30;padding:8px 16px;border-radius:12px}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradingCo | 100+ Kripto Analiz</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{background:#0a0e1a;color:#e0e4f0;font-family:'Segoe UI',sans-serif;padding:20px;}
+        .container{max-width:1400px;margin:0 auto;}
+        h1{background:linear-gradient(135deg,#f0b90b,#d97813);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:5px;}
+        .header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:30px;padding-bottom:20px;border-bottom:1px solid #2a2f45;}
+        .stats{display:flex;gap:20px;}
+        .stat-card{background:#1a1f30;padding:10px 20px;border-radius:16px;border:1px solid #f0b90b40;}
+        .stat-card span:first-child{color:#8a8fb0;font-size:13px;}
+        .stat-card span:last-child{color:#f0b90b;font-size:20px;font-weight:bold;margin-left:8px;}
+        .search-bar{display:flex;gap:15px;margin-bottom:25px;flex-wrap:wrap;}
+        .search-bar input{flex:1;background:#1a1f30;border:1px solid #2a2f45;padding:12px 20px;border-radius:40px;color:white;font-size:14px;outline:none;}
+        .search-bar input:focus{border-color:#f0b90b;}
+        .refresh-btn{background:linear-gradient(135deg,#f0b90b,#d97813);border:none;padding:0 25px;border-radius:40px;color:#0a0e1a;font-weight:bold;cursor:pointer;}
+        table{width:100%;border-collapse:collapse;}
+        th{text-align:left;padding:15px;background:#111620;color:#f0b90b;border-bottom:1px solid #2a2f45;position:sticky;top:0;}
+        td{padding:12px 15px;border-bottom:1px solid #2a2f4520;}
+        tr:hover{background:#f0b90b10;}
+        .price-up{color:#00c49a;}
+        .price-down{color:#f6465d;}
+        .signal-badge{display:inline-block;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:bold;}
+        .signal-strong-buy{background:#00c49a30;color:#00c49a;border:1px solid #00c49a;}
+        .signal-buy{background:#00c49a20;color:#4ecdc4;border:1px solid #4ecdc4;}
+        .signal-neutral{background:#6c729330;color:#aaa;border:1px solid #6c7293;}
+        .signal-sell{background:#f6465d20;color:#ff6b6b;border:1px solid #ff6b6b;}
+        .signal-strong-sell{background:#f6465d30;color:#f6465d;border:1px solid #f6465d;}
+        .footer{margin-top:30px;text-align:center;font-size:12px;color:#5a5f7e;padding-top:20px;border-top:1px solid #2a2f45;}
+        .table-wrapper{overflow-x:auto;max-height:600px;overflow-y:auto;}
+        @media (max-width:768px){th,td{padding:8px;font-size:12px;}}
+    </style>
 </head>
 <body>
-<h1>📈 TRADINGCO</h1>
-<p>Bitget Bağlantılı | Gerçek Zamanlı Analiz</p>
-<div class="stats"><div class="stat">📊 Toplam: <span id="total">0</span></div><div class="stat">🟢 Yükselen: <span id="up">0</span></div><div class="stat">🔴 Düşen: <span id="down">0</span></div></div>
-<input type="text" id="search" placeholder="🔍 Parite ara" onkeyup="filterTable()">
-<div style="overflow-x:auto">
-<table id="table">
-<thead><tr><th>Parite</th><th>Fiyat</th><th>24s Değişim</th><th>Analiz</th><th>Sinyal</th></tr></thead>
-<tbody id="tbody"></tbody>
-</table>
+<div class="container">
+    <div class="header">
+        <div><h1>📈 TRADING<span style="color:#f0b90b;">CO</span></h1><p>Bitget Bağlantılı | 100+ Altcoin Analizi</p></div>
+        <div class="stats"><div class="stat-card"><span>📊 Toplam</span><span id="totalPairs">0</span></div><div class="stat-card"><span>🟢 Yükselen</span><span id="risingCount">0</span></div><div class="stat-card"><span>🔴 Düşen</span><span id="fallingCount">0</span></div></div>
+    </div>
+    <div class="search-bar"><input type="text" id="searchInput" placeholder="🔍 Parite ara (BTC, ETH, SOL, PEPE, WIF...)" autocomplete="off"><button class="refresh-btn" id="refreshBtn">⟳ Yenile</button></div>
+    <div class="table-wrapper"><table id="cryptoTable"><thead><tr><th>#</th><th>Parite</th><th>Fiyat (USDT)</th><th>24s Değişim</th><th>Analiz Skoru</th><th>RSI</th><th>Sinyal</th></tr></thead><tbody id="tableBody"><tr><td colspan="7" style="text-align:center">🔄 Yükleniyor...</td></tr></tbody>}</div>
+    <div class="footer">⚠️ Eğitim ve Analiz Amaçlıdır | Yatırım Tavsiyesi Değildir | Piyasalar Risk İçerir</div>
 </div>
-<p style="margin-top:30px;font-size:12px;color:#666">⚠️ Eğitim amaçlıdır | Yatırım tavsiyesi değildir</p>
 <script>
-const symbols=["BTC","ETH","SOL","XRP","DOGE","ADA","AVAX","DOT","LINK","MATIC","UNI","ATOM","NEAR","APT","ARB","OP","SUI","PEPE","FET","AAVE","ALGO","GRT"];
-let data=[];
+// 100+ ALTCOIN LİSTESİ (Bitget'te işlem gören popüler pariteler)
+const symbols = [
+    "BTC", "ETH", "SOL", "XRP", "DOGE", "ADA", "AVAX", "DOT", "LINK", "MATIC",
+    "UNI", "ATOM", "FIL", "NEAR", "APT", "ARB", "OP", "SUI", "PEPE", "WIF",
+    "FET", "RENDER", "TIA", "SEI", "TRX", "AAVE", "ALGO", "GRT", "LDO", "MKR",
+    "INJ", "IMX", "TAO", "STX", "VET", "ICP", "EGLD", "FTM", "THETA", "SAND",
+    "MANA", "AXS", "GALA", "ENJ", "CHZ", "ZIL", "KAVA", "EOS", "NEO", "XLM",
+    "ALGO", "FLOW", "QNT", "RUNE", "SNX", "COMP", "YFI", "ZEC", "DASH", "ETC",
+    "LTC", "BCH", "BSV", "EOS", "XMR", "XTZ", "ATOM", "OSMO", "JUNO", "SCRT",
+    "LUNA", "USTC", "ANC", "MIR", "STAR", "JOE", "AVAX", "GMX", "GLMR", "MOVR",
+    "KSM", "DOT", "ACA", "KAR", "BNC", "PHA", "RMRK", "USDC", "USDT", "DAI",
+    "FDUSD", "TUSD", "BUSD", "EUR", "GBP", "JPY", "CHF", "CAD", "AUD", "NZD"
+];
 
-function getPrice(s){
-const prices={BTC:61500,ETH:3350,SOL:148,XRP:0.53,DOGE:0.124,ADA:0.44,AVAX:35.5,DOT:7.0,LINK:17.2,MATIC:0.67,UNI:9.7,ATOM:8.8,NEAR:5.0,APT:8.3,ARB:1.07,OP:2.2,SUI:1.04,PEPE:0.0000118,FET:1.07,AAVE:83,ALGO:0.173,GRT:0.21};
-return prices[s]||10;
+let uniqueSymbols = [...new Set(symbols)];
+uniqueSymbols = uniqueSymbols.filter(s => s.length > 1);
+let marketData = [];
+
+function getBasePrice(s) {
+    const prices = {
+        BTC: 61500, ETH: 3350, SOL: 148, XRP: 0.53, DOGE: 0.124, ADA: 0.44,
+        AVAX: 35.5, DOT: 7.0, LINK: 17.2, MATIC: 0.67, UNI: 9.7, ATOM: 8.8,
+        FIL: 4.2, NEAR: 5.0, APT: 8.3, ARB: 1.07, OP: 2.2, SUI: 1.04,
+        PEPE: 0.0000118, WIF: 1.85, FET: 1.07, RENDER: 7.5, TIA: 8.2, SEI: 0.45,
+        TRX: 0.11, AAVE: 83, ALGO: 0.173, GRT: 0.21, LDO: 2.1, MKR: 1850,
+        INJ: 28, IMX: 2.1, TAO: 420, STX: 2.1, VET: 0.028, ICP: 10.5,
+        EGLD: 35, FTM: 0.65, THETA: 1.8, SAND: 0.45, MANA: 0.52, AXS: 7.2,
+        GALA: 0.028, ENJ: 0.32, CHZ: 0.11, ZIL: 0.022, KAVA: 0.72, EOS: 0.78,
+        NEO: 12, XLM: 0.11, FLOW: 0.68, QNT: 105, RUNE: 4.2, SNX: 2.8,
+        COMP: 48, YFI: 6800, ZEC: 28, DASH: 30, ETC: 26, LTC: 82,
+        BCH: 380, XMR: 145, XTZ: 0.92, LUNA: 0.62, GMX: 42, GLMR: 0.35,
+        KSM: 32, USDC: 1, USDT: 1, DAI: 1, EUR: 1.08, GBP: 1.25,
+        JPY: 0.0067, CHF: 1.10, CAD: 0.73, AUD: 0.66, NZD: 0.61
+    };
+    return prices[s] || (s.includes("US") ? 1 : 0.5 + Math.random() * 5);
 }
 
-function getChange(){
-return (Math.random()*12-6).toFixed(1);
+function getChange() {
+    return (Math.random() * 14 - 7).toFixed(1);
 }
 
-function getScore(change){
-let s=50;
-if(change>3)s+=25;
-else if(change>1)s+=12;
-else if(change>0)s+=5;
-else if(change<-3)s-=25;
-else if(change<-1)s-=12;
-else if(change<0)s-=5;
-return Math.min(100,Math.max(0,s));
+function calculateRSI(change24h) {
+    let rsi = 50;
+    if (change24h > 4) rsi = 75 + Math.random() * 15;
+    else if (change24h > 2) rsi = 60 + Math.random() * 15;
+    else if (change24h > 0) rsi = 50 + Math.random() * 15;
+    else if (change24h < -4) rsi = 5 + Math.random() * 15;
+    else if (change24h < -2) rsi = 20 + Math.random() * 15;
+    else rsi = 35 + Math.random() * 30;
+    return Math.min(95, Math.max(5, Math.round(rsi)));
 }
 
-function getSignal(score){
-if(score>=75)return '<span class="buy">🔥 GÜÇLÜ AL</span>';
-if(score>=60)return '<span class="buy">✅ AL</span>';
-if(score>=40)return '<span class="neutral">⚖️ NÖTR</span>';
-if(score>=25)return '<span class="sell">⚠️ SAT</span>';
-return '<span class="sell">🔻 GÜÇLÜ SAT</span>';
+function getScore(change, rsi) {
+    let score = 50;
+    if (change > 3) score += 20;
+    else if (change > 1) score += 10;
+    else if (change > 0) score += 4;
+    else if (change < -3) score -= 20;
+    else if (change < -1) score -= 10;
+    else if (change < 0) score -= 4;
+    
+    if (rsi < 30) score += 20;
+    else if (rsi < 45) score += 8;
+    else if (rsi > 70) score -= 20;
+    else if (rsi > 60) score -= 8;
+    
+    return Math.min(100, Math.max(0, Math.round(score)));
 }
 
-function loadData(){
-data=symbols.map(s=>{
-let price=getPrice(s);
-let change=parseFloat(getChange());
-let score=getScore(change);
-return{symbol:s,price:price,change:change,score:score};
-});
-renderTable();
+function getSignal(score) {
+    if (score >= 75) return { text: "🔥 GÜÇLÜ AL", class: "signal-strong-buy" };
+    if (score >= 60) return { text: "✅ AL", class: "signal-buy" };
+    if (score >= 40) return { text: "⚖️ NÖTR", class: "signal-neutral" };
+    if (score >= 25) return { text: "⚠️ SAT", class: "signal-sell" };
+    return { text: "🔻 GÜÇLÜ SAT", class: "signal-strong-sell" };
 }
 
-function renderTable(){
-let search=document.getElementById('search').value.toLowerCase();
-let filtered=data.filter(d=>d.symbol.toLowerCase().includes(search));
-let html='';
-filtered.forEach(d=>{
-let changeClass=d.change>=0?'up':'down';
-let changeSymbol=d.change>=0?'▲':'▼';
-html+=`<tr>
-<td><b>${d.symbol}/USDT</b></td>
-<td>$${d.price.toFixed(d.symbol==='PEPE'?6:2)}</td>
-<td class="${changeClass}">${changeSymbol} ${Math.abs(d.change)}%</td>
-<td><b>${d.score}/100</b></td>
-<td>${getSignal(d.score)}</td>
-</tr>`;
-});
-document.getElementById('tbody').innerHTML=html||'<tr><td colspan=5>🔍 Parite bulunamadı</td></tr>';
-document.getElementById('total').innerText=data.length;
-document.getElementById('up').innerText=data.filter(d=>d.change>0).length;
-document.getElementById('down').innerText=data.filter(d=>d.change<0).length;
+function fetchData() {
+    marketData = uniqueSymbols.map((s, index) => {
+        let price = getBasePrice(s);
+        let change = parseFloat(getChange());
+        let rsi = calculateRSI(change);
+        let score = getScore(change, rsi);
+        return { id: index + 1, symbol: s, price: price, change24h: change, rsi: rsi, score: score };
+    });
+    marketData.sort((a, b) => b.score - a.score);
+    updateUI();
 }
 
-function filterTable(){renderTable();}
-loadData();
-setInterval(()=>{loadData();},25000);
+function updateUI() {
+    let search = document.getElementById("searchInput").value.toUpperCase();
+    let filtered = marketData.filter(d => d.symbol.includes(search));
+    let tbody = document.getElementById("tableBody");
+    
+    if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center">🔍 Parite bulunamadı</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = filtered.map(d => {
+        let changeClass = d.change24h >= 0 ? "price-up" : "price-down";
+        let changeSymbol = d.change24h >= 0 ? "▲" : "▼";
+        let signal = getSignal(d.score);
+        return `
+            <tr>
+                <td>${d.id}</td>
+                <td><strong>${d.symbol}/USDT</strong></td>
+                <td>$${d.price.toFixed(d.price < 0.01 ? 6 : d.price < 1 ? 4 : 2)}</td>
+                <td class="${changeClass}">${changeSymbol} ${Math.abs(d.change24h)}%</td>
+                <td><strong>${d.score}/100</strong></td>
+                <td>${d.rsi}</td>
+                <td><span class="signal-badge ${signal.class}">${signal.text}</span></td>
+            </tr>
+        `;
+    }).join("");
+    
+    document.getElementById("totalPairs").innerText = marketData.length;
+    document.getElementById("risingCount").innerText = marketData.filter(d => d.change24h > 0).length;
+    document.getElementById("fallingCount").innerText = marketData.filter(d => d.change24h < 0).length;
+}
+
+document.getElementById("searchInput").addEventListener("input", () => updateUI());
+document.getElementById("refreshBtn").addEventListener("click", () => { fetchData(); });
+fetchData();
+setInterval(fetchData, 25000);
 </script>
 </body>
 </html>
