@@ -3,427 +3,211 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TradingCo | Pro Sinyal + Risk Yönetimi + Backtest</title>
+    <title>TradingCo | Hızlı Analiz</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;}
-        body{background:#0a0e1a;color:#e0e4f0;font-family:'Segoe UI',sans-serif;padding:20px;}
-        .container{max-width:1600px;margin:0 auto;}
-        h1{background:linear-gradient(135deg,#f0b90b,#d97813);-webkit-background-clip:text;background-clip:text;color:transparent;}
-        .header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:20px;padding-bottom:15px;border-bottom:1px solid #2a2f45;}
-        .stats{display:flex;gap:15px;flex-wrap:wrap;}
-        .stat-card{background:#1a1f30;padding:8px 16px;border-radius:12px;border:1px solid #f0b90b40;}
-        .stat-card span:first-child{color:#8a8fb0;font-size:12px;}
-        .stat-card span:last-child{color:#f0b90b;font-size:18px;font-weight:bold;margin-left:6px;}
-        
-        /* Risk Butonları */
-        .risk-buttons{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
-        .risk-btn{background:#1a1f30;border:1px solid #2a2f45;padding:8px 20px;border-radius:30px;cursor:pointer;font-size:13px;transition:all 0.3s;}
-        .risk-btn.active{background:linear-gradient(135deg,#f0b90b,#d97813);color:#0a0e1a;border:none;font-weight:bold;}
-        .risk-btn.low{background:#00c49a20;border-color:#00c49a;color:#00c49a;}
-        .risk-btn.medium{background:#f0b90b20;border-color:#f0b90b;color:#f0b90b;}
-        .risk-btn.high{background:#f6465d20;border-color:#f6465d;color:#f6465d;}
-        
-        .search-bar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
-        .search-bar input{flex:1;background:#1a1f30;border:1px solid #2a2f45;padding:10px 16px;border-radius:30px;color:white;font-size:13px;outline:none;}
-        .search-bar input:focus{border-color:#f0b90b;}
-        .refresh-btn{background:linear-gradient(135deg,#f0b90b,#d97813);border:none;padding:0 20px;border-radius:30px;color:#0a0e1a;font-weight:bold;cursor:pointer;}
-        
-        .api-card{background:#1a1f30;border-radius:16px;padding:15px;margin-bottom:20px;border-left:4px solid #f0b90b;}
-        .api-status{display:flex;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;}
-        .status-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:bold;}
-        .status-online{background:#00c49a30;color:#00c49a;border:1px solid #00c49a;}
-        .status-offline{background:#f6465d30;color:#f6465d;border:1px solid #f6465d;}
-        .auto-trade-btn{background:#f0b90b;border:none;padding:8px 20px;border-radius:30px;color:#0a0e1a;font-weight:bold;cursor:pointer;}
-        
-        .trade-history{background:#111620;border-radius:12px;padding:12px;margin-top:15px;max-height:200px;overflow-y:auto;}
-        .trade-item{padding:8px;border-bottom:1px solid #2a2f45;font-size:12px;}
-        .trade-win{color:#00c49a;}
-        .trade-loss{color:#f6465d;}
-        
-        .backtest-results{background:#111620;border-radius:12px;padding:12px;margin-top:15px;}
-        .backtest-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:10px;}
-        .backtest-stat{background:#1a1f30;padding:8px;border-radius:8px;text-align:center;}
-        
+        body{background:#0a0e1a;color:#e0e4f0;font-family:'Segoe UI',sans-serif;padding:15px;}
+        .container{max-width:1400px;margin:0 auto;}
+        h1{background:linear-gradient(135deg,#f0b90b,#d97813);-webkit-background-clip:text;background-clip:text;color:transparent;display:inline-block;}
+        .header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:15px;gap:10px;}
+        .stat-card{background:#1a1f30;padding:6px 12px;border-radius:12px;display:inline-block;margin-right:10px;font-size:13px;}
+        .risk-buttons{display:flex;gap:8px;margin-bottom:15px;flex-wrap:wrap;}
+        .risk-btn{background:#1a1f30;border:1px solid #2a2f45;padding:6px 15px;border-radius:25px;cursor:pointer;font-size:12px;}
+        .risk-btn.active{background:#f0b90b;color:#0a0e1a;border:none;font-weight:bold;}
+        .search-bar{display:flex;gap:8px;margin-bottom:15px;}
+        .search-bar input{flex:1;background:#1a1f30;border:1px solid #2a2f45;padding:8px 15px;border-radius:25px;color:white;outline:none;}
+        .refresh-btn{background:#f0b90b;border:none;padding:8px 20px;border-radius:25px;font-weight:bold;cursor:pointer;}
+        .auto-trade-btn{background:#f0b90b;border:none;padding:6px 15px;border-radius:25px;font-weight:bold;cursor:pointer;font-size:12px;}
         table{width:100%;border-collapse:collapse;}
-        th{text-align:left;padding:12px;background:#111620;color:#f0b90b;font-size:13px;position:sticky;top:0;}
-        td{padding:10px 12px;border-bottom:1px solid #2a2f4520;font-size:13px;}
+        th{text-align:left;padding:10px;background:#111620;color:#f0b90b;font-size:12px;}
+        td{padding:8px 10px;border-bottom:1px solid #2a2f4520;font-size:12px;}
         tr:hover{background:#f0b90b10;}
         .price-up{color:#00c49a;}
         .price-down{color:#f6465d;}
-        .signal-badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:bold;}
-        .signal-strong-buy{background:#00c49a30;color:#00c49a;border:1px solid #00c49a;}
-        .signal-buy{background:#00c49a20;color:#4ecdc4;border:1px solid #4ecdc4;}
-        .signal-neutral{background:#6c729330;color:#aaa;border:1px solid #6c7293;}
-        .signal-sell{background:#f6465d20;color:#ff6b6b;border:1px solid #ff6b6b;}
-        .signal-strong-sell{background:#f6465d30;color:#f6465d;border:1px solid #f6465d;}
-        .table-wrapper{overflow-x:auto;max-height:500px;overflow-y:auto;}
-        .flex-between{display:flex;justify-content:space-between;align-items:center;}
-        .trade-btn{background:linear-gradient(135deg,#f0b90b,#d97813);border:none;padding:4px 12px;border-radius:20px;font-size:11px;cursor:pointer;}
-        .footer{margin-top:30px;text-align:center;font-size:11px;color:#5a5f7e;padding-top:20px;border-top:1px solid #2a2f45;}
-        .quality-high{background:#00c49a15;border-left:3px solid #00c49a;}
-        .quality-veryhigh{background:#00c49a30;border-left:3px solid #00c49a;}
-        @media (max-width:768px){th,td{padding:6px 8px;font-size:11px;}.risk-btn{padding:4px 12px;font-size:11px;}}
+        .signal-badge{display:inline-block;padding:3px 8px;border-radius:15px;font-size:10px;font-weight:bold;}
+        .signal-strong-buy{background:#00c49a30;color:#00c49a;}
+        .signal-buy{background:#00c49a20;color:#4ecdc4;}
+        .signal-neutral{background:#6c729330;color:#aaa;}
+        .signal-sell{background:#f6465d20;color:#ff6b6b;}
+        .signal-strong-sell{background:#f6465d30;color:#f6465d;}
+        .trade-history{background:#111620;border-radius:10px;padding:10px;margin-top:15px;max-height:150px;overflow-y:auto;font-size:11px;}
+        .trade-item{padding:5px;border-bottom:1px solid #2a2f45;}
+        .trade-win{color:#00c49a;}
+        .trade-loss{color:#f6465d;}
+        .footer{margin-top:20px;text-align:center;font-size:10px;color:#5a5f7e;}
+        .table-wrapper{overflow-x:auto;max-height:450px;overflow-y:auto;}
+        @media (max-width:768px){th,td{padding:5px;font-size:10px;}}
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
-        <div><h1>📈 TRADING<span style="color:#f0b90b;">CO</span></h1><p>Pro Sinyal | Risk Yönetimi | Backtest</p></div>
-        <div class="stats">
-            <div class="stat-card"><span>📊 Toplam</span><span id="totalPairs">0</span></div>
-            <div class="stat-card"><span>💰 Kâr/Zarar</span><span id="totalPnL">$0</span></div>
-            <div class="stat-card"><span>📈 Kazanç %</span><span id="winRate">0%</span></div>
-            <div class="stat-card"><span>⭐ Sinyal Kalite</span><span id="avgQuality">0</span></div>
-        </div>
+        <div><h1>📈 TRADINGCO</h1><p style="font-size:11px;">Hızlı Analiz | 30 Coin</p></div>
+        <div><button class="auto-trade-btn" id="toggleAutoTrade">🟢 OTOMATİK: KAPALI</button></div>
     </div>
-
-    <!-- API ve Otomatik İşlem Paneli -->
-    <div class="api-card">
-        <div class="flex-between">
-            <div><strong>🔌 Bitget API Bağlantısı | Paper Trading</strong></div>
-            <button class="auto-trade-btn" id="toggleAutoTrade">🟢 OTOMATİK İŞLEM: KAPALI</button>
-        </div>
-        <div class="api-status">
-            <span class="status-badge status-offline" id="apiStatus">⚫ PAPER TRADING MODU</span>
-            <span>📊 Risk Seviyesi: <strong id="riskLevel">Sadece Güçlü Sinyaller (75+)</strong></span>
-        </div>
-        <div class="flex-between" style="margin-top:10px;">
-            <div>💰 Bakiye: <strong id="userBalance">$10,000</strong></div>
-            <div>📊 Aktif Pozisyon: <strong id="activePositions">0</strong></div>
-            <div>🎯 Hedef Kazanç: <strong id="dailyTarget">0/100$</strong></div>
-        </div>
-        
-        <!-- İşlem Geçmişi -->
-        <div class="trade-history">
-            <strong>📋 İşlem Geçmişi (Son 20)</strong>
-            <div id="historyList">Henüz işlem yok</div>
-        </div>
-        
-        <!-- Backtest Sonuçları -->
-        <div class="backtest-results">
-            <div class="flex-between"><strong>📊 Backtest Sonucu (Son 100 Sinyal)</strong><button class="risk-btn" id="runBacktest" style="padding:4px 12px;">🔄 Yenile</button></div>
-            <div class="backtest-stats" id="backtestStats">
-                <div class="backtest-stat">Toplam İşlem: <span id="btTrades">0</span></div>
-                <div class="backtest-stat">Kazanan: <span id="btWins" style="color:#00c49a;">0</span></div>
-                <div class="backtest-stat">Kaybeden: <span id="btLosses" style="color:#f6465d;">0</span></div>
-                <div class="backtest-stat">Başarı: <span id="btWinRate">0%</span></div>
-                <div class="backtest-stat">Net Kâr: <span id="btPnL">$0</span></div>
-                <div class="backtest-stat">Sharpe: <span id="btSharpe">0</span></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Risk Seviyesi Filtresi (YENİ) -->
-    <div class="risk-buttons">
-        <button class="risk-btn" data-risk="all">📊 Tüm Sinyaller</button>
-        <button class="risk-btn high active" data-risk="high">🟢 Sadece Güçlü (Skor 75+)</button>
-        <button class="risk-btn medium" data-risk="medium">🟡 Sadece Orta (Skor 60-74)</button>
-        <button class="risk-btn low" data-risk="low">🔴 Sadece Zayıf (Skor 40-59)</button>
-    </div>
-
-    <div class="search-bar"><input type="text" id="searchInput" placeholder="🔍 Parite ara" autocomplete="off"><button class="refresh-btn" id="refreshBtn">⟳ Yenile</button></div>
     
-    <div class="table-wrapper"><table id="cryptoTable"><thead><tr><th>#</th><th>Parite</th><th>Fiyat</th><th>24s Değişim</th><th>Kalite Puanı</th><th>Sinyal</th><th>Risk/Ödül</th><th>İşlem</th></table></thead><tbody id="tableBody"><tr><td colspan="8" style="text-align:center">🔄 Yükleniyor......</td></tr></tbody></table></div>
-    <div class="footer">⚠️ Eğitim Amaçlıdır | Strateji: Trend+RIS+Hacim+3 Aşamalı Onay | Risk Yönetimi Aktif | Yatırım Tavsiyesi Değildir</div>
+    <div class="stats">
+        <span class="stat-card">💰 Bakiye: <span id="balance">10000</span>$</span>
+        <span class="stat-card">📈 K/Z: <span id="pnl">0</span>$</span>
+        <span class="stat-card">🎯 Kazanç: <span id="winrate">0</span>%</span>
+    </div>
+
+    <div class="risk-buttons">
+        <button class="risk-btn active" data-risk="all">📊 Tümü</button>
+        <button class="risk-btn" data-risk="high">🟢 Güçlü (75+)</button>
+        <button class="risk-btn" data-risk="medium">🟡 Orta (60-74)</button>
+    </div>
+
+    <div class="search-bar">
+        <input type="text" id="search" placeholder="🔍 Ara (BTC, ETH, PEPE...)">
+        <button class="refresh-btn" id="refresh">⟳</button>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead><tr><th>#</th><th>Coin</th><th>Fiyat</th><th>24s</th><th>Skor</th><th>Sinyal</th><th>İşlem</th></tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+        </table>
+    </div>
+
+    <div class="trade-history" id="historyDiv">
+        <strong>📋 Son İşlemler</strong>
+        <div id="historyList">Henüz işlem yok</div>
+    </div>
+
+    <div class="footer">⚠️ Eğitim amaçlıdır | Paper Trading | Yatırım tavsiyesi değildir</div>
 </div>
 
 <script>
-// ============ KONFİGÜRASYON ============
-let userBalance = 10000;
-let tradeHistory = [];
-let autoTradeEnabled = false;
+// ============ 30 COIN (HIZLI) ============
+const coins = ["BTC","ETH","SOL","XRP","DOGE","ADA","AVAX","DOT","LINK","MATIC","UNI","ATOM","NEAR","APT","ARB","SUI","PEPE","WIF","FET","AAVE","ALGO","GRT","LDO","MKR","INJ","VET","ICP","FTM","SAND","MANA"];
+
+let balance = 10000;
+let trades = [];
+let autoTrade = false;
+let riskFilter = "all";
 let marketData = [];
-let currentRiskFilter = "high";
-let dailyTarget = 100;
-let dailyProfit = 0;
 
-// Parite listesi
-const symbols = ["BTC","ETH","SOL","XRP","DOGE","ADA","AVAX","DOT","LINK","MATIC","UNI","ATOM","NEAR","APT","ARB","SUI","PEPE","WIF","FET","AAVE","ALGO","GRT","LDO","MKR","INJ","IMX","TAO","STX","VET","ICP"];
-
-// Fiyat verileri
-function getBasePrice(s){
-    const prices={BTC:61800,ETH:3380,SOL:152,XRP:0.54,DOGE:0.126,ADA:0.445,AVAX:36,DOT:7.1,LINK:17.5,MATIC:0.68,UNI:9.8,ATOM:8.9,NEAR:5.1,APT:8.5,ARB:1.09,SUI:1.06,PEPE:0.0000122,WIF:1.88,FET:1.09,AAVE:84,ALGO:0.175,GRT:0.212,LDO:2.13,MKR:1860,INJ:28.5,IMX:2.15,TAO:425,STX:2.15,VET:0.0285,ICP:10.8};
-    return prices[s]||10;
-}
+// Fiyatlar
+const prices = {BTC:61500,ETH:3350,SOL:148,XRP:0.53,DOGE:0.124,ADA:0.44,AVAX:35.5,DOT:7.0,LINK:17.2,MATIC:0.67,UNI:9.7,ATOM:8.8,NEAR:5.0,APT:8.3,ARB:1.07,SUI:1.04,PEPE:0.0000118,WIF:1.85,FET:1.07,AAVE:83,ALGO:0.173,GRT:0.21,LDO:2.1,MKR:1850,INJ:28.5,VET:0.0285,ICP:10.8,FTM:0.65,SAND:0.45,MANA:0.52};
 
 function randomChange(){return (Math.random()*10-5).toFixed(1);}
 
-// ============ GELİŞMİŞ RSI HESAPLAMA ============
-function getRSI(change){
-    let rsi=50;
-    if(change>3)rsi=65+Math.random()*20;
-    else if(change>1)rsi=55+Math.random()*15;
-    else if(change>0)rsi=45+Math.random()*15;
-    else if(change<-3)rsi=15+Math.random()*20;
-    else if(change<-1)rsi=25+Math.random()*15;
-    else if(change<0)rsi=35+Math.random()*20;
-    return Math.min(95,Math.max(5,Math.round(rsi)));
+function getScore(change){
+    let s=50;
+    if(change>2)s+=25; else if(change>0)s+=10;
+    else if(change<-2)s-=25; else if(change<0)s-=10;
+    return Math.min(100,Math.max(0,Math.round(s)));
 }
 
-// ============ 3 AŞAMALI TREND ANALİZİ (YENİ) ============
-function getTrendStrength(price, ema50, ema200){
-    if(price>ema50 && ema50>ema200)return{trend:"GÜÇLÜ YÜKSELİŞ",score:20,allowed:["LONG"]};
-    if(price>ema50)return{trend:"YÜKSELİŞ",score:10,allowed:["LONG"]};
-    if(price<ema50 && ema50<ema200)return{trend:"GÜÇLÜ DÜŞÜŞ",score:-20,allowed:["SHORT"]};
-    if(price<ema50)return{trend:"DÜŞÜŞ",score:-10,allowed:["SHORT"]};
-    return{trend:"NÖTR",score:0,allowed:["LONG","SHORT"]};
+function getSignal(score){
+    if(score>=75)return{text:"GÜÇLÜ AL",class:"signal-strong-buy",action:"LONG"};
+    if(score>=60)return{text:"AL",class:"signal-buy",action:"LONG"};
+    if(score>=40)return{text:"NÖTR",class:"signal-neutral",action:"HOLD"};
+    if(score>=25)return{text:"SAT",class:"signal-sell",action:"SHORT"};
+    return{text:"GÜÇLÜ SAT",class:"signal-strong-sell",action:"SHORT"};
 }
 
-// ============ HACMİN GÜCÜ (YENİ) ============
-function getVolumeStrength(volumeRatio){
-    if(volumeRatio>2.5)return{score:15,text:"🚀 Patlama",color:"#00c49a"};
-    if(volumeRatio>1.8)return{score:10,text:"⚡ Yüksek",color:"#4ecdc4"};
-    if(volumeRatio>1.2)return{score:5,text:"📈 Artıyor",color:"#f0b90b"};
-    return{score:0,text:"📉 Normal",color:"#8a8fb0"};
-}
-
-// ============ RİSK/ÖDÜL ORANI HESAPLAMA ============
-function getRiskReward(score, trendScore){
-    let rr = 1.5;
-    if(score>=85 && trendScore>=15)rr=3.0;
-    else if(score>=75 && trendScore>=10)rr=2.5;
-    else if(score>=65 && trendScore>=5)rr=2.0;
-    else if(score>=55)rr=1.5;
-    else rr=1.0;
-    return{ratio:rr,text:`1:${rr}`,stopLoss:rr>=2.5?2:rr>=2?3:4};
-}
-
-// ============ KALİTE PUANI (0-100) + SKOR HESAPLAMA ============
-function calculateQualityScore(change, rsi, volumeRatio){
-    let score=50;
-    // Trend yönü
-    if(change>2.5)score+=15;
-    else if(change>1)score+=8;
-    else if(change>0)score+=3;
-    else if(change<-2.5)score-=15;
-    else if(change<-1)score-=8;
-    else if(change<0)score-=3;
-    // RSI durumu
-    if(rsi<30)score+=22;
-    else if(rsi<45)score+=10;
-    else if(rsi>70)score-=22;
-    else if(rsi>60)score-=10;
-    // Hacim gücü
-    if(volumeRatio>2)score+=12;
-    else if(volumeRatio>1.5)score+=6;
-    // Kalite sınıflandırması
-    let quality = score>=75?"🟢 YÜKSEK":score>=60?"🟡 ORTA":"🔴 DÜŞÜK";
-    return{score:Math.min(100,Math.max(0,Math.round(score))),quality:quality};
-}
-
-// ============ SİNYAL ÜRETME ============
-function getSignal(score, rsi, trendAllowed){
-    if(score>=75 && trendAllowed.includes("LONG"))return{text:"🔥 GÜÇLÜ AL",class:"signal-strong-buy",action:"LONG",priority:1};
-    if(score>=60 && trendAllowed.includes("LONG"))return{text:"✅ AL",class:"signal-buy",action:"LONG",priority:2};
-    if(score>=40)return{text:"⚖️ NÖTR",class:"signal-neutral",action:"HOLD",priority:3};
-    if(score>=25 && trendAllowed.includes("SHORT"))return{text:"⚠️ SAT",class:"signal-sell",action:"SHORT",priority:2};
-    if(trendAllowed.includes("SHORT"))return{text:"🔻 GÜÇLÜ SAT",class:"signal-strong-sell",action:"SHORT",priority:1};
-    return{text:"⚖️ NÖTR",class:"signal-neutral",action:"HOLD",priority:3};
-}
-
-// ============ İŞLEM AÇMA (Risk Yönetimi ile) ============
-function executeTrade(symbol, action, price, qualityScore, rr, trendScore){
-    if(!autoTradeEnabled) return false;
+function executeTrade(symbol, action, price, score){
+    if(!autoTrade) return false;
+    if(riskFilter==="high" && score<75) return false;
+    if(riskFilter==="medium" && (score<60 || score>=75)) return false;
     
-    // Risk filtresi: sadece seçilen kalitede sinyallere işlem aç
-    if(currentRiskFilter==="high" && qualityScore<75) return false;
-    if(currentRiskFilter==="medium" && (qualityScore<60 || qualityScore>=75)) return false;
-    if(currentRiskFilter==="low" && (qualityScore<40 || qualityScore>=60)) return false;
+    let successProb = score>=75?85:score>=60?70:score>=40?50:35;
+    let isWin = Math.random()*100 < successProb;
+    let pnl = isWin ? 4.5 : -3.5;
+    balance += pnl;
     
-    const tradeAmount = 100; // Her işlemde 100 USDT
-    const stopLossPct = rr.stopLoss;
-    const takeProfit1 = (rr.ratio * 1.2).toFixed(1);
-    const takeProfit2 = (rr.ratio * 2).toFixed(1);
-    
-    // Başarı olasılığı (kalite skoruna göre)
-    const successProbability = Math.min(95, Math.max(45, qualityScore + trendScore));
-    const randomOutcome = Math.random() * 100;
-    const isWin = randomOutcome < successProbability;
-    
-    let pnl = 0;
-    if(isWin){
-        // Kazanç: kalite skoruna göre %3-8 arası
-        const profitPct = (successProbability / 100) * 8 + 1;
-        pnl = tradeAmount * (profitPct / 100);
-    } else {
-        // Kayıp: stop-loss oranına göre
-        const lossPct = stopLossPct;
-        pnl = -tradeAmount * (lossPct / 100);
-    }
-    
-    userBalance += pnl;
-    dailyProfit += pnl;
-    
-    const trade = {
-        id: Date.now(),
-        symbol: symbol,
-        action: action,
-        entryPrice: price,
-        pnl: pnl,
-        qualityScore: qualityScore,
-        isWin: isWin,
-        rr: rr.ratio,
-        timestamp: new Date().toLocaleTimeString()
-    };
-    
-    tradeHistory.unshift(trade);
-    if(tradeHistory.length > 20) tradeHistory.pop();
-    
-    updateTradeHistory();
-    updateStats();
+    trades.unshift({symbol,action,price,pnl:pnl.toFixed(2),isWin,time:new Date().toLocaleTimeString()});
+    if(trades.length>15) trades.pop();
+    updateUI();
     return true;
 }
 
-// ============ BACKTEST HESAPLAMA (YENİ) ============
-function runBacktest(){
-    let totalTrades=0, wins=0, losses=0, totalPnL=0, returns=[];
-    for(let i=0;i<100;i++){
-        let change=parseFloat(randomChange());
-        let rsi=getRSI(change);
-        let volumeRatio=1+Math.random()*2;
-        let quality=calculateQualityScore(change,rsi,volumeRatio);
-        let trend={score:quality.score>70?15:quality.score>50?5:-5,allowed:quality.score>60?["LONG"]:["SHORT"]};
-        let signal=getSignal(quality.score,rsi,trend.allowed);
-        if(signal.action==="HOLD") continue;
-        
-        totalTrades++;
-        let successProb=Math.min(85,Math.max(40,quality.score));
-        let isWin=Math.random()*100<successProb;
-        if(isWin){wins++;totalPnL+=8;}
-        else{losses++;totalPnL-=4;}
-        returns.push(isWin?8:-4);
-    }
-    let winRate=totalTrades>0?(wins/totalTrades*100).toFixed(1):0;
-    let avgReturn=returns.reduce((a,b)=>a+b,0)/returns.length;
-    let stdDev=Math.sqrt(returns.map(r=>Math.pow(r-avgReturn,2)).reduce((a,b)=>a+b,0)/returns.length);
-    let sharpe=stdDev>0?(avgReturn/stdDev).toFixed(2):0;
+function updateUI(){
+    document.getElementById("balance").innerHTML = balance.toFixed(0);
+    let totalPnL = balance-10000;
+    document.getElementById("pnl").innerHTML = (totalPnL>=0?"+":"")+totalPnL.toFixed(2);
+    let winCount = trades.filter(t=>t.isWin).length;
+    let winRate = trades.length>0 ? (winCount/trades.length*100).toFixed(0) : 0;
+    document.getElementById("winrate").innerHTML = winRate;
     
-    document.getElementById("btTrades").innerText=totalTrades;
-    document.getElementById("btWins").innerText=wins;
-    document.getElementById("btLosses").innerText=losses;
-    document.getElementById("btWinRate").innerHTML=`${winRate}%`;
-    document.getElementById("btPnL").innerHTML=`$${totalPnL.toFixed(2)}`;
-    document.getElementById("btSharpe").innerHTML=sharpe;
-}
-
-// ============ ARAYÜZ GÜNCELLEMELERİ ============
-function updateTradeHistory(){
-    const historyDiv = document.getElementById("historyList");
-    if(tradeHistory.length===0){historyDiv.innerHTML="Henüz işlem yok";return;}
-    historyDiv.innerHTML = tradeHistory.slice(0,15).map(t=>`
-        <div class="trade-item"><span class="${t.isWin?'trade-win':'trade-loss'}">${t.isWin?'✅':'❌'} ${t.symbol}</span>
-        <span>${t.action}</span> <span>G:$${t.entryPrice.toFixed(2)}</span>
-        <span>K/Z:${t.pnl>=0?'+':''}$${t.pnl.toFixed(2)}</span>
-        <span style="font-size:10px;">Kalite:${t.qualityScore}</span> <span>${t.timestamp}</span>
-        </div>`).join("");
-}
-
-function updateStats(){
-    const totalPnL = userBalance - 10000;
-    const winCount = tradeHistory.filter(t=>t.isWin).length;
-    const winRate = tradeHistory.length>0?(winCount/tradeHistory.length*100).toFixed(0):0;
-    const avgQuality = tradeHistory.length>0?Math.round(tradeHistory.reduce((a,b)=>a+b.qualityScore,0)/tradeHistory.length):0;
-    document.getElementById("totalPnL").innerHTML = `${totalPnL>=0?'+':''}$${totalPnL.toFixed(2)}`;
-    document.getElementById("totalPnL").style.color = totalPnL>=0?'#00c49a':'#f6465d';
-    document.getElementById("winRate").innerHTML = `${winRate}%`;
-    document.getElementById("winRate").style.color = winRate>=50?'#00c49a':'#f6465d';
-    document.getElementById("userBalance").innerHTML = `$${userBalance.toFixed(2)}`;
-    document.getElementById("avgQuality").innerHTML = avgQuality;
-    document.getElementById("dailyTarget").innerHTML = `${dailyProfit>0?dailyProfit:0}/${dailyTarget}$`;
+    let historyHtml = trades.slice(0,10).map(t=>`<div class="trade-item"><span class="${t.isWin?'trade-win':'trade-loss'}">${t.isWin?'✅':'❌'} ${t.symbol}</span> ${t.action} $${t.pnl} ${t.time}</div>`).join("");
+    document.getElementById("historyList").innerHTML = historyHtml || "Henüz işlem yok";
 }
 
 function fetchData(){
-    marketData = symbols.map((s,idx)=>{
-        let price=getBasePrice(s);
-        let change=parseFloat(randomChange());
-        let rsi=getRSI(change);
-        let volumeRatio=1+Math.random()*1.8;
-        let quality=calculateQualityScore(change,rsi,volumeRatio);
-        let trend={score:quality.score>70?15:quality.score>50?5:-5,allowed:quality.score>60?["LONG"]:["SHORT"]};
-        let signal=getSignal(quality.score,rsi,trend.allowed);
-        let rr=getRiskReward(quality.score,trend.score);
+    marketData = coins.map((c,idx)=>{
+        let price = prices[c] || 10;
+        let change = parseFloat(randomChange());
+        let score = getScore(change);
+        let signal = getSignal(score);
         
-        // Otomatik işlem kontrolü
-        if(autoTradeEnabled && signal.action!=="HOLD"){
-            executeTrade(s, signal.action, price, quality.score, rr, trend.score);
+        if(autoTrade && signal.action !== "HOLD"){
+            executeTrade(c, signal.action, price, score);
         }
         
-        return{id:idx+1, symbol:s, price:price, change24h:change, quality:quality, signal:signal, rr:rr, rsi:rsi};
+        return {id:idx+1, symbol:c, price:price, change:change, score:score, signal:signal};
     });
-    marketData.sort((a,b)=>b.quality.score-a.quality.score);
-    updateUI();
+    marketData.sort((a,b)=>b.score - a.score);
+    renderTable();
 }
 
-function updateUI(){
-    let search=document.getElementById("searchInput").value.toUpperCase();
-    let filtered=marketData.filter(d=>{
-        if(currentRiskFilter==="high")return d.quality.score>=75 && d.symbol.includes(search);
-        if(currentRiskFilter==="medium")return d.quality.score>=60 && d.quality.score<75 && d.symbol.includes(search);
-        if(currentRiskFilter==="low")return d.quality.score>=40 && d.quality.score<60 && d.symbol.includes(search);
+function renderTable(){
+    let search = document.getElementById("search").value.toUpperCase();
+    let filtered = marketData.filter(d=>{
+        if(riskFilter==="high") return d.score>=75 && d.symbol.includes(search);
+        if(riskFilter==="medium") return d.score>=60 && d.score<75 && d.symbol.includes(search);
         return d.symbol.includes(search);
     });
-    let tbody=document.getElementById("tableBody");
-    tbody.innerHTML=filtered.map(d=>{
-        let changeClass=d.change24h>=0?"price-up":"price-down";
-        let changeSym=d.change24h>=0?"▲":"▼";
-        let qualityClass=d.quality.score>=75?"quality-veryhigh":d.quality.score>=60?"quality-high":"";
-        return `<tr class="${qualityClass}">
-            <td>${d.id}</td><td><strong>${d.symbol}/USDT</strong></td>
+    
+    let html = filtered.map(d=>{
+        let changeClass = d.change>=0?"price-up":"price-down";
+        let changeSym = d.change>=0?"▲":"▼";
+        let btnText = d.signal.action==="LONG"?"📈":d.signal.action==="SHORT"?"📉":"⏸️";
+        return `<tr>
+            <td>${d.id}</td>
+            <td><b>${d.symbol}</b></td>
             <td>$${d.price.toFixed(d.price<0.01?6:d.price<1?4:2)}</td>
-            <td class="${changeClass}">${changeSym} ${Math.abs(d.change24h)}%</td>
-            <td><strong>${d.quality.score}</strong><div style="font-size:10px;">${d.quality.quality}</div></td>
+            <td class="${changeClass}">${changeSym} ${Math.abs(d.change)}%</td>
+            <td><b>${d.score}</b></td>
             <td><span class="signal-badge ${d.signal.class}">${d.signal.text}</span></td>
-            <td>${d.rr.text}<div style="font-size:10px;">SL:${d.rr.stopLoss}%</div></td>
-            <td><button class="trade-btn" onclick="manualTrade('${d.symbol}','${d.signal.action}',${d.price},${d.quality.score},${d.rr.stopLoss})">${d.signal.action==="LONG"?"📈 AL":d.signal.action==="SHORT"?"📉 SAT":"⏸️"}</button></td>
+            <td><button class="refresh-btn" style="padding:2px 8px;font-size:10px;" onclick="manualTrade('${d.symbol}','${d.signal.action}',${d.price},${d.score})">${btnText}</button></td>
         </tr>`;
     }).join("");
-    document.getElementById("totalPairs").innerText=filtered.length;
+    document.getElementById("tbody").innerHTML = html || '<tr><td colspan="7">Coin bulunamadı</td></tr>';
 }
 
-function manualTrade(symbol, action, price, quality, stopLoss){
-    if(action==="HOLD"){alert("Bu parite için sinyal yok!");return;}
-    let rr={ratio:2,stopLoss:stopLoss};
-    executeTrade(symbol,action,price,quality,rr,10);
-    alert(`${symbol} için ${action} işlemi açıldı!`);
+function manualTrade(symbol, action, price, score){
+    if(action==="HOLD"){alert("Sinyal yok!");return;}
+    executeTrade(symbol, action, price, score);
+    alert(`${symbol} ${action} işlemi açıldı!`);
     fetchData();
 }
 
-// ============ EVENT LİSTENERLAR ============
-document.getElementById("toggleAutoTrade").addEventListener("click",()=>{
-    autoTradeEnabled=!autoTradeEnabled;
-    const btn=document.getElementById("toggleAutoTrade");
-    const status=document.getElementById("apiStatus");
-    if(autoTradeEnabled){
-        btn.innerHTML="🔴 OTOMATİK İŞLEM: AÇIK";
-        btn.style.background="#f6465d";
-        status.innerHTML="🟢 OTOMATİK İŞLEM AKTİF | Risk Yönetimi AÇIK";
-        status.className="status-badge status-online";
-    } else {
-        btn.innerHTML="🟢 OTOMATİK İŞLEM: KAPALI";
-        btn.style.background="#f0b90b";
-        status.innerHTML="⚫ PAPER TRADING MODU | Risk Filtresi: "+currentRiskFilter.toUpperCase();
-        status.className="status-badge status-offline";
-    }
-});
-
-document.getElementById("runBacktest").addEventListener("click",()=>runBacktest());
+// Eventler
+document.getElementById("toggleAutoTrade").onclick = ()=>{
+    autoTrade = !autoTrade;
+    let btn = document.getElementById("toggleAutoTrade");
+    btn.innerHTML = autoTrade ? "🔴 OTOMATİK: AÇIK" : "🟢 OTOMATİK: KAPALI";
+    btn.style.background = autoTrade ? "#f6465d" : "#f0b90b";
+};
 
 document.querySelectorAll(".risk-btn").forEach(btn=>{
-    btn.addEventListener("click",()=>{
+    btn.onclick = ()=>{
         document.querySelectorAll(".risk-btn").forEach(b=>b.classList.remove("active"));
         btn.classList.add("active");
-        currentRiskFilter=btn.dataset.risk;
-        document.getElementById("riskLevel").innerHTML=currentRiskFilter==="high"?"🟢 Sadece Güçlü (75+)":currentRiskFilter==="medium"?"🟡 Sadece Orta (60-74)":"🔴 Sadece Zayıf (40-59)";
-        updateUI();
-    });
+        riskFilter = btn.dataset.risk;
+        renderTable();
+    };
 });
 
-document.getElementById("searchInput").addEventListener("input",()=>updateUI());
-document.getElementById("refreshBtn").addEventListener("click",()=>{fetchData();runBacktest();});
+document.getElementById("refresh").onclick = ()=>{fetchData();};
+document.getElementById("search").oninput = ()=>{renderTable();};
 
 fetchData();
-runBacktest();
-setInterval(fetchData,20000);
+setInterval(fetchData, 25000);
 </script>
 </body>
 </html>
