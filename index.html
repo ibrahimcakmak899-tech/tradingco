@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TradingCo | Binance Futures Vadeli İşlem | 99+ Coin</title>
+    <title>TradingCo | Kalıcı Paper Trading | Binance Futures</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;}
         body{background:#0a0e1a;color:#e0e4f0;font-family:'Segoe UI',sans-serif;padding:20px;}
@@ -35,7 +35,7 @@
 <body>
 <div class="container">
     <div class="header">
-        <div><h1>📈 TRADING<span style="color:#f0b90b;">CO</span></h1><p>Binance Futures | 99+ Vadeli İşlem | Gerçek Fiyatlar</p></div>
+        <div><h1>📈 TRADING<span style="color:#f0b90b;">CO</span></h1><p>Kalıcı Paper Trading | Binance Futures</p></div>
         <div><button class="auto-trade-btn" id="toggleAutoTrade">🟢 OTOMATİK: KAPALI</button></div>
     </div>
     
@@ -47,7 +47,7 @@
     </div>
 
     <div class="search-bar">
-        <input type="text" id="searchInput" placeholder="🔍 Coin ara (BTC, ETH, SOL, PEPE, WIF...)" autocomplete="off">
+        <input type="text" id="searchInput" placeholder="🔍 Coin ara (BTC, ETH, SOL, PEPE...)" autocomplete="off">
         <button class="refresh-btn" id="refreshBtn">⟳ Yenile</button>
     </div>
     
@@ -64,61 +64,65 @@
         </table>
     </div>
 
-    <div class="footer">⚠️ Eğitim amaçlıdır | Veri kaynağı: Binance Futures API (gerçek zamanlı) | Paper Trading | Vadeli işlemler yüksek risklidir</div>
+    <div class="footer">⚠️ Eğitim amaçlıdır | Veri kaynağı: Binance Futures API | Paper Trading | Sayfa yenilense bile veriler KALICI</div>
 </div>
 
 <script>
-// ============ 99 VADELİ İŞLEM COİN LİSTESİ (Binance Futures) ============
+// ============ KALICI DEPOLAMA (localStorage) ============
+let balance = 10000;
+let trades = [];
+let autoTrade = false;
+let marketData = [];
+
+// Bakiye işlemleri
+function saveBalance() { localStorage.setItem('tradingCo_balance', balance); }
+function loadBalance() { let saved = localStorage.getItem('tradingCo_balance'); if(saved) balance = parseFloat(saved); else balance = 10000; }
+
+// İşlem geçmişi
+function saveTrades() { localStorage.setItem('tradingCo_trades', JSON.stringify(trades)); }
+function loadTrades() { let saved = localStorage.getItem('tradingCo_trades'); if(saved) trades = JSON.parse(saved); else trades = []; }
+
+// Otomatik işlem durumu
+function saveAutoTrade() { localStorage.setItem('tradingCo_autoTrade', autoTrade); }
+function loadAutoTrade() { let saved = localStorage.getItem('tradingCo_autoTrade'); if(saved !== null) autoTrade = saved === 'true'; else autoTrade = false; }
+
+// Başlangıçta yükle
+loadBalance();
+loadTrades();
+loadAutoTrade();
+
+// ============ 99+ COİN LİSTESİ ============
 const futuresSymbols = [
     "BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT", "DOGEUSDT", "ADAUSDT", "AVAXUSDT", "DOTUSDT", "LINKUSDT", "MATICUSDT",
     "UNIUSDT", "ATOMUSDT", "NEARUSDT", "APTUSDT", "ARBUSDT", "OPUSDT", "SUIUSDT", "PEPEUSDT", "WIFUSDT", "FETUSDT",
     "AAVEUSDT", "ALGOUSDT", "GRTUSDT", "LDOUSDT", "MKRUSDT", "INJUSDT", "IMXUSDT", "TAOUSDT", "STXUSDT", "VETUSDT",
     "ICPUSDT", "EGLDUSDT", "FTMUSDT", "SANDUSDT", "MANAUSDT", "AXSUSDT", "GALAUSDT", "ENJUSDT", "CHZUSDT", "ZILUSDT",
     "KAVAUSDT", "EOSUSDT", "NEOUSDT", "XLMUSDT", "FLOWUSDT", "QNTUSDT", "RUNEUSDT", "SNXUSDT", "COMPUSDT", "YFIUSDT",
-    "ZECUSDT", "DASHUSDT", "ETCUSDT", "LTCUSDT", "BCHUSDT", "XMRUSDT", "XTZUSDT", "KSMUSDT", "GMXUSDT", "LUNAUSDT",
-    "RNDRUSDT", "TIAUSDT", "SEIUSDT", "BLURUSDT", "ARUSDT", "AGIXUSDT", "OCEANUSDT", "ROSEUSDT", "CFXUSDT", "MINAUSDT",
-    "AUDIOUSDT", "HNTUSDT", "IOTXUSDT", "SKLUSDT", "CELOUSDT", "ONEUSDT", "ZRXUSDT", "BATUSDT", "KNCUSDT", "BALUSDT",
-    "CRVUSDT", "1INCHUSDT", "SUSHIUSDT", "UMAUSDT", "LRCUSDT", "RAYUSDT", "FTTUSDT", "SRMUSDT", "HIFIUSDT", "BONKUSDT",
-    "ORDIUSDT", "1000SATSUSDT", "MEMEUSDT", "JUPUSDT", "PYTHUSDT", "TONUSDT", "NOTUSDT", "REZUSDT", "BBUSDT"
+    "ZECUSDT", "DASHUSDT", "ETCUSDT", "LTCUSDT", "BCHUSDT", "XMRUSDT", "XTZUSDT", "KSMUSDT", "GMXUSDT", "LUNAUSDT"
 ];
 
-let marketData = [];
-let balance = 10000;
-let trades = [];
-let autoTrade = false;
-let lastPrices = {};
-
-// Binance Futures API'den fiyat çek
+// ============ BINANCE FUTURES API ============
 async function fetchBinanceFutures() {
     try {
-        // Önce 24 saatlik ticker verilerini al
         const tickerUrl = 'https://fapi.binance.com/fapi/v1/ticker/24hr';
-        const tickerResponse = await fetch(tickerUrl);
-        const tickerData = await tickerResponse.json();
-        
-        // Fiyat verilerini al
         const priceUrl = 'https://fapi.binance.com/fapi/v1/ticker/price';
-        const priceResponse = await fetch(priceUrl);
-        const priceData = await priceResponse.json();
         
-        // Verileri birleştir
+        const [tickerRes, priceRes] = await Promise.all([fetch(tickerUrl), fetch(priceUrl)]);
+        const tickerData = await tickerRes.json();
+        const priceData = await priceRes.json();
+        
         const tickerMap = {};
         tickerData.forEach(t => { tickerMap[t.symbol] = t; });
-        
         const priceMap = {};
         priceData.forEach(p => { priceMap[p.symbol] = p.price; });
         
-        // Sadece listemizdeki coinleri al
         marketData = [];
         futuresSymbols.forEach((symbol, idx) => {
             const ticker = tickerMap[symbol];
             const price = parseFloat(priceMap[symbol]);
-            
             if (ticker && price) {
                 const change = parseFloat(ticker.priceChangePercent);
                 const volume = parseFloat(ticker.quoteVolume);
-                
-                // RSI hesaplama (simüle - gerçek RSI için k线 verisi gerekir)
                 let rsi = 50;
                 if (change > 2) rsi = 65 + Math.random() * 15;
                 else if (change < -2) rsi = 20 + Math.random() * 15;
@@ -126,17 +130,11 @@ async function fetchBinanceFutures() {
                 else if (change < 0) rsi = 35 + Math.random() * 10;
                 rsi = Math.min(95, Math.max(5, Math.round(rsi)));
                 
-                // Sinyal üret
                 let signal = { text: "NÖTR", class: "signal-neutral", action: "HOLD" };
-                if (rsi < 30 && change > -1) {
-                    signal = { text: "LONG", class: "signal-long", action: "LONG" };
-                } else if (rsi > 70 && change < 1) {
-                    signal = { text: "SHORT", class: "signal-short", action: "SHORT" };
-                } else if (change > 2.5 && rsi < 65) {
-                    signal = { text: "LONG", class: "signal-long", action: "LONG" };
-                } else if (change < -2.5 && rsi > 35) {
-                    signal = { text: "SHORT", class: "signal-short", action: "SHORT" };
-                }
+                if (rsi < 30 && change > -1) signal = { text: "LONG", class: "signal-long", action: "LONG" };
+                else if (rsi > 70 && change < 1) signal = { text: "SHORT", class: "signal-short", action: "SHORT" };
+                else if (change > 2.5 && rsi < 65) signal = { text: "LONG", class: "signal-long", action: "LONG" };
+                else if (change < -2.5 && rsi > 35) signal = { text: "SHORT", class: "signal-short", action: "SHORT" };
                 
                 marketData.push({
                     id: idx + 1,
@@ -151,7 +149,6 @@ async function fetchBinanceFutures() {
             }
         });
         
-        // Fiyata göre sırala (BTC ilk)
         marketData.sort((a, b) => {
             if (a.symbol === "BTC") return -1;
             if (b.symbol === "BTC") return 1;
@@ -159,18 +156,16 @@ async function fetchBinanceFutures() {
         });
         
         updateTable();
-        updateStats();
-        
+        updateUI();
         document.getElementById('lastUpdate').innerHTML = `Son güncelleme: ${new Date().toLocaleTimeString('tr-TR')}`;
         document.getElementById('totalCoins').innerText = marketData.length;
-        
     } catch (error) {
         console.error("API Hatası:", error);
-        document.getElementById('tableBody').innerHTML = `<tr><td colspan="8" style="text-align:center">❌ Binance Futures bağlantı hatası. Lütfen daha sonra tekrar deneyin.<br>${error.message}</td></tr>`;
+        document.getElementById('tableBody').innerHTML = `<tr><td colspan="8">❌ Binance Futures bağlantı hatası</td></tr>`;
     }
 }
 
-// Otomatik işlem simülasyonu
+// ============ İŞLEM AÇMA (KALICI KAYITLI) ============
 function executeTrade(coin, action, price) {
     if (!autoTrade) return false;
     if (action === "HOLD") return false;
@@ -178,19 +173,15 @@ function executeTrade(coin, action, price) {
     const tradeAmount = 10;
     const leverage = 10;
     const positionValue = tradeAmount * leverage;
-    
-    // Rastgele başarı (gerçek sinyal kalitesine göre)
     const successProb = 68;
     const isWin = Math.random() * 100 < successProb;
-    
     let pnl = 0;
-    if (isWin) {
-        pnl = positionValue * 0.045;
-    } else {
-        pnl = -positionValue * 0.025;
-    }
+    
+    if (isWin) pnl = positionValue * 0.045;
+    else pnl = -positionValue * 0.025;
     
     balance += pnl;
+    saveBalance();
     
     trades.unshift({
         coin: coin,
@@ -200,44 +191,36 @@ function executeTrade(coin, action, price) {
         isWin: isWin,
         time: new Date().toLocaleTimeString()
     });
+    if (trades.length > 30) trades.pop();
+    saveTrades();
     
-    if (trades.length > 20) trades.pop();
-    updateStats();
+    updateUI();
     return true;
 }
 
 function updateTable() {
     const searchTerm = document.getElementById('searchInput').value.toUpperCase();
     const filtered = marketData.filter(d => d.symbol.includes(searchTerm));
-    
     const tbody = document.getElementById('tableBody');
-    if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center">🔍 Coin bulunamadı</td></tr>';
-        return;
-    }
+    if (filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="8">🔍 Coin bulunamadı</td></tr>'; return; }
     
     tbody.innerHTML = filtered.map(d => {
         const changeClass = d.change >= 0 ? 'price-up' : 'price-down';
         const changeSymbol = d.change >= 0 ? '▲' : '▼';
-        const signalClass = d.signal.class;
-        const signalText = d.signal.text;
-        
-        return `
-            <tr>
-                <td>${d.id}</td>
-                <td><strong>${d.symbol}</strong><div style="font-size:10px;color:#8a8fb0;">Perpetual</div></td>
-                <td>$${d.price.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
-                <td class="${changeClass}">${changeSymbol} ${Math.abs(d.change).toFixed(2)}%</td>
-                <td>$${(d.volume / 1000000).toFixed(1)}M</td>
-                <td>${d.rsi}<div style="font-size:10px;">${d.rsi < 30 ? "Aşırı Satım" : d.rsi > 70 ? "Aşırı Alım" : "Nötr"}</div></td>
-                <td><span class="signal-badge ${signalClass}">${signalText}</span></td>
-                <td><button class="refresh-btn" style="padding:4px 12px;font-size:11px;" onclick="manualTrade('${d.symbol}','${d.signal.action}',${d.price})">${d.signal.action === "LONG" ? "📈 AL" : d.signal.action === "SHORT" ? "📉 SAT" : "⏸️"}</button></td>
-             </tr>
-        `;
+        return `<tr>
+            <td>${d.id}</td>
+            <td><strong>${d.symbol}</strong><div style="font-size:10px;">Perpetual</div></td>
+            <td>$${d.price.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+            <td class="${changeClass}">${changeSymbol} ${Math.abs(d.change).toFixed(2)}%</td>
+            <td>$${(d.volume / 1000000).toFixed(1)}M</td>
+            <td>${d.rsi}</td>
+            <td><span class="signal-badge ${d.signal.class}">${d.signal.text}</span></td>
+            <td><button class="refresh-btn" style="padding:4px 12px;font-size:11px;" onclick="manualTrade('${d.symbol}','${d.signal.action}',${d.price})">${d.signal.action === "LONG" ? "📈 AL" : d.signal.action === "SHORT" ? "📉 SAT" : "⏸️"}</button></td>
+        </tr>`;
     }).join('');
 }
 
-function updateStats() {
+function updateUI() {
     document.getElementById('balance').innerHTML = balance.toFixed(0);
     const totalPnL = balance - 10000;
     document.getElementById('pnl').innerHTML = (totalPnL >= 0 ? '+' : '') + totalPnL.toFixed(2);
@@ -247,48 +230,41 @@ function updateStats() {
 }
 
 function manualTrade(symbol, action, price) {
-    if (action === "HOLD") {
-        alert(`${symbol} için sinyal yok!`);
-        return;
-    }
+    if (action === "HOLD") { alert(`${symbol} için sinyal yok!`); return; }
     executeTrade(symbol, action, price);
     alert(`${symbol} için ${action} işlemi açıldı! Paper Trading`);
-
- updateStats();
+    updateUI();
 }
 
-// Otomatik işlem döngüsü
+// ============ OTOMATİK İŞLEM DÖNGÜSÜ ============
 let autoInterval;
 function startAutoTrading() {
     if (autoInterval) clearInterval(autoInterval);
     autoInterval = setInterval(() => {
         if (autoTrade && marketData.length > 0) {
             const bestSignal = marketData.find(d => d.signal.action !== "HOLD");
-            if (bestSignal) {
-                executeTrade(bestSignal.symbol, bestSignal.signal.action, bestSignal.price);
-            }
+            if (bestSignal) executeTrade(bestSignal.symbol, bestSignal.signal.action, bestSignal.price);
         }
     }, 60000);
 }
 
-// Event listeners
+// ============ EVENT LİSTENERLAR ============
 document.getElementById('toggleAutoTrade').onclick = () => {
     autoTrade = !autoTrade;
+    saveAutoTrade();
     const btn = document.getElementById('toggleAutoTrade');
     btn.innerHTML = autoTrade ? "🔴 OTOMATİK: AÇIK" : "🟢 OTOMATİK: KAPALI";
     btn.style.background = autoTrade ? "#f6465d" : "#f0b90b";
     if (autoTrade) startAutoTrading();
 };
-
-document.getElementById('refreshBtn').onclick = () => {
-    fetchBinanceFutures();
-};
+document.getElementById('refreshBtn').onclick = () => fetchBinanceFutures();
 document.getElementById('searchInput').oninput = () => updateTable();
 
-// Başlat
+// ============ BAŞLAT ============
 fetchBinanceFutures();
-setInterval(() => { fetchBinanceFutures(); }, 30000);
+setInterval(() => { if (document.visibilityState === "visible") fetchBinanceFutures(); }, 30000);
 startAutoTrading();
+updateUI();
 </script>
 </body>
 </html>
