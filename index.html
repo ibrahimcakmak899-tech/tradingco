@@ -336,7 +336,27 @@ function testTGSinyal() {
 }
 
 // Sayfa yüklendiğinde test sinyali gönder (opsiyonel)
-// testTGSinyal();</script>
+// testTGSinyal();// ============ TELEGRAM SİNYAL BİLDİRİMİ ============
+const TG_TOKEN = "8604915778:AAEMgDz0xitgzgAgpvVMMsIwYBQfpnI-ovg";
+const TG_CHAT_ID = "919901623";
+
+async function tgSignal(coin, action, price, tp, sl, strength, hasFVG) {
+    const emoji = action === "LONG" ? "🟢" : "🔴";
+    const fvgStar = hasFVG ? " ⭐ FVG" : "";
+    const message = `${emoji} <b>${action}</b> SİNYALİ${fvgStar}\n\n` +
+                    `🪙 <b>${coin}/USDT</b>\n` +
+                    `💰 Giriş: $${price}\n` +
+                    `🎯 TP: $${tp}\n` +
+                    `🛑 SL: $${sl}\n` +
+                    `⚡ Güven: %${strength}`;
+    
+    const url = `https://api.telegram.org/bot${TG_TOKEN}/sendMessage`;
+    await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: TG_CHAT_ID, text: message, parse_mode: 'HTML' })
+    });
+}</script>
 </body>
 </html>// ============ TELEGRAM BİLDİRİM ============
 const TG_TOKEN = "8604915778:AAEMgDz0xitgzgAgpvVMMsIwYBQfpnI-ovg";
