@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TradingCo | Kalıcı Paper Trading | Gerçek Fiyatlar</title>
+    <title>TradingCo | FVG Stratejili Paper Trading</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;}
         body{background:#0a0e1a;color:#e0e4f0;font-family:'Segoe UI',sans-serif;padding:20px;}
@@ -24,18 +24,20 @@
         .signal-long{background:#00c49a20;color:#00c49a;padding:4px 12px;border-radius:20px;display:inline-block;}
         .signal-short{background:#f6465d20;color:#f6465d;padding:4px 12px;border-radius:20px;display:inline-block;}
         .signal-neutral{background:#6c729330;color:#aaa;padding:4px 12px;border-radius:20px;display:inline-block;}
+        .fvg-star{color:#f0b90b;font-size:16px;margin-right:5px;}
         .trade-history{background:#111620;border-radius:12px;padding:12px;margin-top:20px;max-height:200px;overflow-y:auto;}
         .trade-item{padding:8px;border-bottom:1px solid #2a2f45;font-size:12px;}
         .trade-win{color:#00c49a;}
         .trade-loss{color:#f6465d;}
         .footer{margin-top:30px;text-align:center;font-size:11px;color:#5a5f7e;}
         .last-update{font-size:11px;color:#8a8fb0;text-align:right;margin-bottom:10px;}
+        .fvg-badge{background:#f0b90b20;border:1px solid #f0b90b;color:#f0b90b;padding:2px 6px;border-radius:12px;font-size:9px;margin-left:5px;}
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
-        <div><h1>📈 TRADINGCO</h1><p>Kalıcı Paper Trading | Gerçek Fiyatlar</p></div>
+        <div><h1>📈 TRADINGCO</h1><p>FVG Stratejili | Kalıcı Paper Trading</p></div>
         <div><button class="auto-trade-btn" id="autoTradeBtn">🟢 OTOMATİK: KAPALI</button></div>
     </div>
     
@@ -56,10 +58,10 @@
     <div style="overflow-x:auto">
         <table id="cryptoTable">
             <thead>
-                <tr><th>#</th><th>Coin</th><th>Fiyat (USD)</th><th>24s Değişim</th><th>Sinyal</th><th>İşlem</th></tr>
+                <tr><th>#</th><th>Coin</th><th>Fiyat (USD)</th><th>24s Değişim</th><th>FVG</th><th>Sinyal</th><th>İşlem</th></tr>
             </thead>
             <tbody id="tableBody">
-                <tr><td colspan="6" style="text-align:center">🔄 Gerçek fiyatlar yükleniyor...<br>📡 CoinCap API kullanılıyor</td></tr>
+                <tr><td colspan="7" style="text-align:center">🔄 Gerçek fiyatlar yükleniyor...<br>📡 CoinCap API kullanılıyor</td></tr>
             </tbody>
         </table>
     </div>
@@ -69,7 +71,7 @@
         <div id="historyList">Henüz işlem yok</div>
     </div>
 
-    <div class="footer">⚠️ Sayfa yenilense bile veriler KALICI | CoinCap API (gerçek fiyatlar) | Paper Trading</div>
+    <div class="footer">⚠️ Sayfa yenilense bile veriler KALICI | CoinCap API | ⭐ FVG tespit edilen coin'ler | Yatırım tavsiyesi değildir</div>
 </div>
 
 <script>
@@ -80,6 +82,7 @@ let balance = 10000;
 let trades = [];
 let autoTrade = false;
 let marketData = [];
+let priceHistory = {}; // FVG tespiti için fiyat geçmişi
 
 // ============================================================
 // 2. LOCALSTORAGE İŞLEMLERİ (KALICI VERİ)
@@ -88,7 +91,6 @@ function saveToLocalStorage() {
     localStorage.setItem('tradingco_balance', balance);
     localStorage.setItem('tradingco_trades', JSON.stringify(trades));
     localStorage.setItem('tradingco_autotrade', autoTrade);
-    console.log("✅ Kaydedildi - Bakiye:", balance);
 }
 
 function loadFromLocalStorage() {
@@ -100,8 +102,15 @@ function loadFromLocalStorage() {
     if (savedTrades !== null) trades = JSON.parse(savedTrades);
     if (savedAuto !== null) autoTrade = savedAuto === 'true';
     
-    console.log("✅ Yüklendi - Bakiye:", balance, "Auto:", autoTrade);
     updateUI();
+    renderTradeHistory();
+    
+    // Buton durumunu güncelle
+    const btn = document.getElementById('autoTradeBtn');
+    if (btn) {
+        btn.innerHTML = autoTrade ? "🔴 OTOMATİK: AÇIK" : "🟢 OTOMATİK: KAPALI";
+        btn.style.background = autoTrade ? "#f6465d" : "#f0b90b";
+    }
 }
 
 // ============================================================
@@ -135,13 +144,31 @@ const coins = [
     { id: "bitcoin-cash", symbol: "BCH", name: "Bitcoin Cash" },
     { id: "stellar", symbol: "XLM", name: "Stellar" },
     { id: "vechain", symbol: "VET", name: "VeChain" },
-    { id: "internet-computer", symbol: "ICP", name: "Internet Computer" },
-    { id: "filecoin", symbol: "FIL", name: "Filecoin" },
-    { id: "theta-token", symbol: "THETA", name: "Theta" }
+    { id: "filecoin", symbol: "FIL", name: "Filecoin" }
 ];
 
 // ============================================================
-// 4. COİNCAP API (GERÇEK FİYATLAR - CORS SORUNSUZ)
+// 4. FVG TESPİTİ (3 mum desenine göre)
+// ============================================================
+function detectFVG(prices) {
+    // prices: son 3 fiyat [eski, orta, yeni]
+    if (!prices || prices.length < 3) return false;
+    
+    const candle1 = prices[0];
+    const candle2 = prices[1];
+    const candle3 = prices[2];
+    
+    // Yükseliş FVG: 1.mum tepesi < 2.mum dibi ve 2.mum tepesi > 3.mum dibi
+    const bullishFVG = (candle1.high < candle2.low) && (candle2.high > candle3.low);
+    
+    // Düşüş FVG: 1.mum dibi > 2.mum tepesi ve 2.mum dibi < 3.mum tepesi
+    const bearishFVG = (candle1.low > candle2.high) && (candle2.low < candle3.high);
+    
+    return bullishFVG || bearishFVG;
+}
+
+// ============================================================
+// 5. COİNCAP API (GERÇEK FİYATLAR)
 // ============================================================
 async function fetchRealPrices() {
     try {
@@ -159,9 +186,40 @@ async function fetchRealPrices() {
                 const price = parseFloat(item.priceUsd);
                 const change = parseFloat(item.changePercent24Hr);
                 
-                let signal = { text: "NÖTR", action: "HOLD", class: "signal-neutral" };
-                if (change > 1.5) signal = { text: "LONG ▲", action: "LONG", class: "signal-long" };
-                else if (change < -1.5) signal = { text: "SHORT ▼", action: "SHORT", class: "signal-short" };
+                // Fiyat geçmişini güncelle (FVG için)
+                if (!priceHistory[coinInfo.symbol]) {
+                    priceHistory[coinInfo.symbol] = [];
+                }
+                priceHistory[coinInfo.symbol].push({
+                    low: price * 0.99,
+                    high: price * 1.01,
+                    close: price
+                });
+                if (priceHistory[coinInfo.symbol].length > 3) priceHistory[coinInfo.symbol].shift();
+                
+                // FVG kontrolü
+                const hasFVG = priceHistory[coinInfo.symbol].length >= 3 ? detectFVG(priceHistory[coinInfo.symbol]) : false;
+                
+                // Sinyal üretimi (FVG varsa sinyal güçlenir)
+                let signal = { text: "NÖTR", action: "HOLD", class: "signal-neutral", strength: 0 };
+                let baseSignal = "";
+                
+                if (change > 1.5) baseSignal = "LONG";
+                else if (change < -1.5) baseSignal = "SHORT";
+                
+                if (baseSignal === "LONG") {
+                    if (hasFVG) {
+                        signal = { text: "LONG ⭐", action: "LONG", class: "signal-long", strength: 85 };
+                    } else {
+                        signal = { text: "LONG", action: "LONG", class: "signal-long", strength: 68 };
+                    }
+                } else if (baseSignal === "SHORT") {
+                    if (hasFVG) {
+                        signal = { text: "SHORT ⭐", action: "SHORT", class: "signal-short", strength: 85 };
+                    } else {
+                        signal = { text: "SHORT", action: "SHORT", class: "signal-short", strength: 68 };
+                    }
+                }
                 
                 marketData.push({
                     id: idx + 1,
@@ -169,6 +227,7 @@ async function fetchRealPrices() {
                     name: coinInfo.name,
                     price: price,
                     change: change,
+                    hasFVG: hasFVG,
                     signal: signal
                 });
             }
@@ -181,14 +240,14 @@ async function fetchRealPrices() {
         
     } catch (error) {
         console.error("API Hatası:", error);
-        document.getElementById('tableBody').innerHTML = `<tr><td colspan="6">❌ API bağlantı hatası. Lütfen sayfayı yenileyin.<br>${error.message}</td></tr>`;
+        document.getElementById('tableBody').innerHTML = `<tr><td colspan="7" style="text-align:center">❌ API bağlantı hatası: ${error.message}<br>Lütfen sayfayı yenileyin</td></tr>`;
     }
 }
 
 // ============================================================
-// 5. İŞLEM AÇMA
+// 6. İŞLEM AÇMA (FVG güçlü sinyallere öncelik)
 // ============================================================
-function openTrade(coin, action, price) {
+function openTrade(coin, action, price, strength) {
     if (!autoTrade) {
         alert("Önce 'Otomatik İşlem: AÇIK' yapın!");
         return false;
@@ -201,7 +260,7 @@ function openTrade(coin, action, price) {
     const tradeAmount = 10;
     const leverage = 10;
     const positionValue = tradeAmount * leverage;
-    const winChance = 68;
+    const winChance = strength || 68;
     const isWin = Math.random() * 100 < winChance;
     
     let pnl = 0;
@@ -216,6 +275,7 @@ function openTrade(coin, action, price) {
         price: price,
         pnl: pnl.toFixed(2),
         isWin: isWin,
+        fvgBoost: strength >= 80,
         time: new Date().toLocaleTimeString()
     });
     
@@ -225,12 +285,11 @@ function openTrade(coin, action, price) {
     updateUI();
     renderTradeHistory();
     
-    console.log(`İşlem: ${coin} ${action} | K/Z: ${pnl.toFixed(2)}`);
     return true;
 }
 
 // ============================================================
-// 6. ARAYÜZ GÜNCELLEMELERİ
+// 7. ARAYÜZ GÜNCELLEMELERİ
 // ============================================================
 function renderTable() {
     const searchTerm = document.getElementById('searchInput').value.toUpperCase();
@@ -238,21 +297,25 @@ function renderTable() {
     const tbody = document.getElementById('tableBody');
     
     if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6">🔍 Coin bulunamadı</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7">🔍 Coin bulunamadı</td></tr>';
         return;
     }
     
     tbody.innerHTML = filtered.map(d => {
         const changeClass = d.change >= 0 ? 'price-up' : 'price-down';
         const changeSymbol = d.change >= 0 ? '▲' : '▼';
+        const fvgStar = d.hasFVG ? '<span class="fvg-star">⭐</span>' : '';
+        const fvgBadge = d.hasFVG ? '<span class="fvg-badge">FVG</span>' : '';
+        
         return `
             <tr>
                 <td>${d.id}</td>
-                <td><strong>${d.symbol}</strong><div style="font-size:10px;color:#8a8fb0;">${d.name}</div></td>
+                <td><strong>${fvgStar} ${d.symbol}</strong> ${fvgBadge}<div style="font-size:10px;color:#8a8fb0;">${d.name}</div></td>
                 <td>$${d.price.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
                 <td class="${changeClass}">${changeSymbol} ${Math.abs(d.change).toFixed(2)}%</td>
+                <td>${d.hasFVG ? '✅ VAR' : '❌ YOK'}</td>
                 <td><span class="${d.signal.class}">${d.signal.text}</span></td>
-                <td><button class="refresh-btn" style="padding:4px 12px;font-size:11px;" onclick="manualTrade('${d.symbol}','${d.signal.action}',${d.price})">${d.signal.action === "LONG" ? "📈 AL" : d.signal.action === "SHORT" ? "📉 SAT" : "⏸️"}</button></td>
+                <td><button class="refresh-btn" style="padding:4px 12px;font-size:11px;" onclick="manualTrade('${d.symbol}','${d.signal.action}',${d.price},${d.signal.strength})">${d.signal.action === "LONG" ? "📈 AL" : d.signal.action === "SHORT" ? "📉 SAT" : "⏸️"}</button></td>
             </tr>
         `;
     }).join('');
@@ -271,6 +334,7 @@ function renderTradeHistory() {
             <span>${t.action}</span>
             <span>Giriş: $${t.price}</span>
             <span>K/Z: ${t.pnl >= 0 ? '+' : ''}$${t.pnl}</span>
+            ${t.fvgBoost ? '<span style="color:#f0b90b;">⭐ FVG</span>' : ''}
             <span>${t.time}</span>
         </div>
     `).join('');
@@ -286,10 +350,10 @@ function updateUI() {
 }
 
 // ============================================================
-// 7. MANUEL VE OTOMATİK İŞLEM
+// 8. MANUEL VE OTOMATİK İŞLEM
 // ============================================================
-function manualTrade(coin, action, price) {
-    openTrade(coin, action, price);
+function manualTrade(coin, action, price, strength) {
+    openTrade(coin, action, price, strength);
     updateUI();
     renderTradeHistory();
 }
@@ -300,9 +364,13 @@ function startAutoTrading() {
     if (autoInterval) clearInterval(autoInterval);
     autoInterval = setInterval(() => {
         if (autoTrade && marketData.length > 0) {
-            const bestSignal = marketData.find(d => d.signal.action !== "HOLD");
+            // Önce FVG'li coin'lere öncelik ver
+            let bestSignal = marketData.find(d => d.hasFVG && d.signal.action !== "HOLD");
+            if (!bestSignal) {
+                bestSignal = marketData.find(d => d.signal.action !== "HOLD");
+            }
             if (bestSignal) {
-                openTrade(bestSignal.symbol, bestSignal.signal.action, bestSignal.price);
+                openTrade(bestSignal.symbol, bestSignal.signal.action, bestSignal.price, bestSignal.signal.strength);
                 renderTable();
             }
         }
@@ -310,7 +378,7 @@ function startAutoTrading() {
 }
 
 // ============================================================
-// 8. EVENT LİSTENERLAR
+// 9. EVENT LİSTENERLAR
 // ============================================================
 document.getElementById('autoTradeBtn').onclick = () => {
     autoTrade = !autoTrade;
@@ -328,13 +396,12 @@ document.getElementById('refreshBtn').onclick = () => {
 document.getElementById('searchInput').oninput = () => renderTable();
 
 // ============================================================
-// 9. BAŞLAT
+// 10. BAŞLAT
 // ============================================================
 loadFromLocalStorage();
 fetchRealPrices();
 setInterval(fetchRealPrices, 30000);
-renderTradeHistory();
-updateUI();
+startAutoTrading();
 </script>
 </body>
 </html>
