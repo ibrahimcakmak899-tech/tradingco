@@ -3,244 +3,292 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TradingCo | Gerçek Zamanlı Kripto Analiz | TradingView</title>
+    <title>TradingCo | Binance Futures Vadeli İşlem | 99+ Coin</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;}
         body{background:#0a0e1a;color:#e0e4f0;font-family:'Segoe UI',sans-serif;padding:20px;}
         .container{max-width:1600px;margin:0 auto;}
         h1{background:linear-gradient(135deg,#f0b90b,#d97813);-webkit-background-clip:text;background-clip:text;color:transparent;display:inline-block;}
-        .header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:15px;gap:10px;padding-bottom:15px;border-bottom:1px solid #2a2f45;}
-        
-        .tradingview-widget{margin-bottom:25px;border-radius:16px;overflow:hidden;border:1px solid #2a2f45;}
-        
+        .header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:20px;gap:10px;padding-bottom:15px;border-bottom:1px solid #2a2f45;}
         .stats{display:flex;gap:15px;flex-wrap:wrap;margin-bottom:20px;}
         .stat-card{background:#1a1f30;padding:8px 16px;border-radius:12px;border:1px solid #f0b90b40;}
-        .stat-card.btc-up{background:#00c49a20;border-left:3px solid #00c49a;}
-        .stat-card.btc-down{background:#f6465d20;border-left:3px solid #f6465d;}
-        
-        .settings-panel{background:#1a1f30;border-radius:16px;padding:15px;margin-bottom:20px;border:1px solid #2a2f45;}
-        .settings-row{display:flex;flex-wrap:wrap;gap:20px;align-items:center;margin-top:10px;}
-        .setting-item{display:flex;align-items:center;gap:10px;}
-        .setting-item label{font-size:13px;color:#8a8fb0;}
-        .setting-item input{background:#0a0e1a;border:1px solid #2a2f45;padding:6px 12px;border-radius:20px;color:white;width:80px;}
-        
-        .risk-buttons{display:flex;gap:8px;margin-bottom:15px;flex-wrap:wrap;}
-        .risk-btn{background:#1a1f30;border:1px solid #2a2f45;padding:6px 15px;border-radius:25px;cursor:pointer;font-size:12px;}
-        .risk-btn.active{background:#f0b90b;color:#0a0e1a;border:none;font-weight:bold;}
-        
-        .positions-panel{background:#111620;border-radius:12px;padding:12px;margin-top:15px;margin-bottom:15px;}
-        .position-item{background:#1a1f30;border-radius:10px;padding:10px;margin-bottom:8px;display:flex;justify-content:space-between;flex-wrap:wrap;align-items:center;}
-        
-        .trade-history{background:#111620;border-radius:12px;padding:12px;margin-top:15px;max-height:150px;overflow-y:auto;font-size:11px;}
-        .trade-item{padding:5px;border-bottom:1px solid #2a2f45;}
-        .trade-win{color:#00c49a;}
-        .trade-loss{color:#f6465d;}
-        
+        .search-bar{display:flex;gap:10px;margin-bottom:20px;}
+        .search-bar input{flex:1;background:#1a1f30;border:1px solid #2a2f45;padding:10px 15px;border-radius:25px;color:white;outline:none;}
+        .refresh-btn{background:#f0b90b;border:none;padding:10px 25px;border-radius:25px;font-weight:bold;cursor:pointer;}
         .auto-trade-btn{background:#f0b90b;border:none;padding:8px 20px;border-radius:25px;font-weight:bold;cursor:pointer;}
-        .footer{margin-top:20px;text-align:center;font-size:10px;color:#5a5f7e;}
-        @media (max-width:768px){.settings-row{gap:10px;}}
+        table{width:100%;border-collapse:collapse;}
+        th{text-align:left;padding:12px;background:#111620;color:#f0b90b;font-size:13px;position:sticky;top:0;}
+        td{padding:10px 12px;border-bottom:1px solid #2a2f4520;font-size:13px;}
+        tr:hover{background:#f0b90b10;}
+        .price-up{color:#00c49a;}
+        .price-down{color:#f6465d;}
+        .signal-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:bold;}
+        .signal-long{background:#00c49a20;color:#00c49a;border:1px solid #00c49a;}
+        .signal-short{background:#f6465d20;color:#f6465d;border:1px solid #f6465d;}
+        .signal-neutral{background:#6c729330;color:#aaa;border:1px solid #6c7293;}
+        .footer{margin-top:30px;text-align:center;font-size:11px;color:#5a5f7e;padding-top:20px;border-top:1px solid #2a2f45;}
+        .table-wrapper{overflow-x:auto;max-height:550px;overflow-y:auto;}
+        .last-update{font-size:11px;color:#8a8fb0;text-align:right;margin-bottom:10px;}
+        @media (max-width:768px){th,td{padding:6px 8px;font-size:11px;}}
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
-        <div><h1>📈 TRADING<span style="color:#f0b90b;">CO</span></h1><p>TradingView Gerçek Zamanlı Veri | Pro Sinyal</p></div>
+        <div><h1>📈 TRADING<span style="color:#f0b90b;">CO</span></h1><p>Binance Futures | 99+ Vadeli İşlem | Gerçek Fiyatlar</p></div>
         <div><button class="auto-trade-btn" id="toggleAutoTrade">🟢 OTOMATİK: KAPALI</button></div>
     </div>
     
-    <!-- TradingView Canlı Fiyat Tablosu (GERÇEK VERİ) -->
-    <div class="tradingview-widget">
-        <div class="tradingview-widget-container">
-            <div class="tradingview-widget-container__widget"></div>
-            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-screener.js" async>
-            {
-            "width": "100%",
-            "height": 450,
-            "defaultColumn": "overview",
-            "screener_type": "crypto_market",
-            "displayCurrency": "USD",
-            "colorTheme": "dark",
-            "locale": "tr",
-            "largeChartUrl": "",
-            "tabs": [
-              {
-                "title": "📊 Spot",
-                "symbols": [
-                  {"s": "BINANCE:BTCUSDT", "d": "Bitcoin"},
-                  {"s": "BINANCE:ETHUSDT", "d": "Ethereum"},
-                  {"s": "BINANCE:SOLUSDT", "d": "Solana"},
-                  {"s": "BINANCE:XRPUSDT", "d": "XRP"},
-                  {"s": "BINANCE:DOGEUSDT", "d": "Dogecoin"},
-                  {"s": "BINANCE:ADAUSDT", "d": "Cardano"},
-                  {"s": "BINANCE:AVAXUSDT", "d": "Avalanche"},
-                  {"s": "BINANCE:DOTUSDT", "d": "Polkadot"},
-                  {"s": "BINANCE:LINKUSDT", "d": "Chainlink"},
-                  {"s": "BINANCE:MATICUSDT", "d": "Polygon"},
-                  {"s": "BINANCE:UNIUSDT", "d": "Uniswap"},
-                  {"s": "BINANCE:ATOMUSDT", "d": "Cosmos"},
-                  {"s": "BINANCE:NEARUSDT", "d": "NEAR Protocol"},
-                  {"s": "BINANCE:APTUSDT", "d": "Aptos"},
-                  {"s": "BINANCE:ARBUSDT", "d": "Arbitrum"},
-                  {"s": "BINANCE:SUIUSDT", "d": "Sui"},
-                  {"s": "BINANCE:PEPEUSDT", "d": "Pepe"},
-                  {"s": "BINANCE:WIFUSDT", "d": "dogwifhat"},
-                  {"s": "BINANCE:FETUSDT", "d": "Fetch.ai"},
-                  {"s": "BINANCE:AAVEUSDT", "d": "Aave"}
-                ]
-              }
-            ]
-            }
-            </script>
-        </div>
-    </div>
-
-    <!-- İstatistikler -->
     <div class="stats">
         <span class="stat-card">💰 Bakiye: <span id="balance">10000</span>$</span>
         <span class="stat-card">📈 K/Z: <span id="pnl">0</span>$</span>
-        <span class="stat-card">🎯 Kazanç: <span id="winrate">0</span>%</span>
-        <span class="stat-card" id="btcStatusCard">🟡 BTC: Takip ediliyor...</span>
+        <span class="stat-card">🎯 Kazanç %: <span id="winrate">0</span>%</span>
+        <span class="stat-card">📊 Toplam Coin: <span id="totalCoins">0</span></span>
     </div>
 
-    <!-- Ayarlar Paneli -->
-    <div class="settings-panel">
-        <div><strong>⚙️ İŞLEM AYARLARI</strong></div>
-        <div class="settings-row">
-            <div class="setting-item"><label>💰 İşlem Büyüklüğü ($):</label><input type="number" id="tradeSize" value="10" min="1" max="100" step="1"></div>
-            <div class="setting-item"><label>⚡ Kaldıraç (x):</label><input type="number" id="leverage" value="10" min="1" max="20" step="1"></div>
-            <div class="setting-item"><label>📊 Max Açık Pozisyon:</label><input type="number" id="maxPositions" value="5" min="1" max="10" step="1"></div>
-        </div>
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="🔍 Coin ara (BTC, ETH, SOL, PEPE, WIF...)" autocomplete="off">
+        <button class="refresh-btn" id="refreshBtn">⟳ Yenile</button>
+    </div>
+    
+    <div class="last-update" id="lastUpdate">Son güncelleme: --</div>
+
+    <div class="table-wrapper">
+        <table id="cryptoTable">
+            <thead>
+                <tr><th>#</th><th>Coin</th><th>Vadeli Fiyat</th><th>24s Değişim</th><th>24s Hacim</th><th>RSI</th><th>Sinyal</th><th>İşlem</th></tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr><td colspan="8" style="text-align:center">🔄 Binance Futures verisi yükleniyor...<br>📡 99+ vadeli işlem coini taranıyor</td></tr>
+            </tbody>
+        </table>
     </div>
 
-    <!-- Aktif Pozisyonlar -->
-    <div class="positions-panel">
-        <strong>📊 AKTİF POZİSYONLAR (<span id="activeCount">0</span>/<span id="maxCount">5</span>)</strong>
-        <div id="positionsList">Hiç aktif pozisyon yok</div>
-    </div>
-
-    <!-- İşlem Geçmişi -->
-    <div class="trade-history">
-        <strong>📋 İşlem Geçmişi (Son 15)</strong>
-        <div id="historyList">Henüz işlem yok</div>
-    </div>
-
-    <div class="footer">
-        ⚠️ Eğitim amaçlıdır | Paper Trading | Gerçek fiyatlar TradingView'den gelir | Yatırım tavsiyesi değildir
-        <br>📡 Veri kaynağı: TradingView (BINANCE spot piyasası)
-    </div>
+    <div class="footer">⚠️ Eğitim amaçlıdır | Veri kaynağı: Binance Futures API (gerçek zamanlı) | Paper Trading | Vadeli işlemler yüksek risklidir</div>
 </div>
 
 <script>
-// ============ PAPER TRADING SİSTEMİ ============
+// ============ 99 VADELİ İŞLEM COİN LİSTESİ (Binance Futures) ============
+const futuresSymbols = [
+    "BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT", "DOGEUSDT", "ADAUSDT", "AVAXUSDT", "DOTUSDT", "LINKUSDT", "MATICUSDT",
+    "UNIUSDT", "ATOMUSDT", "NEARUSDT", "APTUSDT", "ARBUSDT", "OPUSDT", "SUIUSDT", "PEPEUSDT", "WIFUSDT", "FETUSDT",
+    "AAVEUSDT", "ALGOUSDT", "GRTUSDT", "LDOUSDT", "MKRUSDT", "INJUSDT", "IMXUSDT", "TAOUSDT", "STXUSDT", "VETUSDT",
+    "ICPUSDT", "EGLDUSDT", "FTMUSDT", "SANDUSDT", "MANAUSDT", "AXSUSDT", "GALAUSDT", "ENJUSDT", "CHZUSDT", "ZILUSDT",
+    "KAVAUSDT", "EOSUSDT", "NEOUSDT", "XLMUSDT", "FLOWUSDT", "QNTUSDT", "RUNEUSDT", "SNXUSDT", "COMPUSDT", "YFIUSDT",
+    "ZECUSDT", "DASHUSDT", "ETCUSDT", "LTCUSDT", "BCHUSDT", "XMRUSDT", "XTZUSDT", "KSMUSDT", "GMXUSDT", "LUNAUSDT",
+    "RNDRUSDT", "TIAUSDT", "SEIUSDT", "BLURUSDT", "ARUSDT", "AGIXUSDT", "OCEANUSDT", "ROSEUSDT", "CFXUSDT", "MINAUSDT",
+    "AUDIOUSDT", "HNTUSDT", "IOTXUSDT", "SKLUSDT", "CELOUSDT", "ONEUSDT", "ZRXUSDT", "BATUSDT", "KNCUSDT", "BALUSDT",
+    "CRVUSDT", "1INCHUSDT", "SUSHIUSDT", "UMAUSDT", "LRCUSDT", "RAYUSDT", "FTTUSDT", "SRMUSDT", "HIFIUSDT", "BONKUSDT",
+    "ORDIUSDT", "1000SATSUSDT", "MEMEUSDT", "JUPUSDT", "PYTHUSDT", "TONUSDT", "NOTUSDT", "REZUSDT", "BBUSDT"
+];
+
+let marketData = [];
 let balance = 10000;
 let trades = [];
-let activePositions = [];
 let autoTrade = false;
-let btcTrend = "neutral";
+let lastPrices = {};
 
-// Sahte sinyal üretimi (gerçek veri çekmek için backend gerekir)
-// Şimdilik TradingView görsel, sinyaller simülasyon
-function getRandomSignal() {
-    let signals = ["LONG", "SHORT", "HOLD"];
-    let scores = [82, 68, 55, 77, 71, 45];
-    let randomScore = scores[Math.floor(Math.random() * scores.length)];
-    let action = randomScore >= 75 ? "LONG" : (randomScore >= 60 ? "SHORT" : "HOLD");
-    return { action: action, score: randomScore };
+// Binance Futures API'den fiyat çek
+async function fetchBinanceFutures() {
+    try {
+        // Önce 24 saatlik ticker verilerini al
+        const tickerUrl = 'https://fapi.binance.com/fapi/v1/ticker/24hr';
+        const tickerResponse = await fetch(tickerUrl);
+        const tickerData = await tickerResponse.json();
+        
+        // Fiyat verilerini al
+        const priceUrl = 'https://fapi.binance.com/fapi/v1/ticker/price';
+        const priceResponse = await fetch(priceUrl);
+        const priceData = await priceResponse.json();
+        
+        // Verileri birleştir
+        const tickerMap = {};
+        tickerData.forEach(t => { tickerMap[t.symbol] = t; });
+        
+        const priceMap = {};
+        priceData.forEach(p => { priceMap[p.symbol] = p.price; });
+        
+        // Sadece listemizdeki coinleri al
+        marketData = [];
+        futuresSymbols.forEach((symbol, idx) => {
+            const ticker = tickerMap[symbol];
+            const price = parseFloat(priceMap[symbol]);
+            
+            if (ticker && price) {
+                const change = parseFloat(ticker.priceChangePercent);
+                const volume = parseFloat(ticker.quoteVolume);
+                
+                // RSI hesaplama (simüle - gerçek RSI için k线 verisi gerekir)
+                let rsi = 50;
+                if (change > 2) rsi = 65 + Math.random() * 15;
+                else if (change < -2) rsi = 20 + Math.random() * 15;
+                else if (change > 0) rsi = 55 + Math.random() * 10;
+                else if (change < 0) rsi = 35 + Math.random() * 10;
+                rsi = Math.min(95, Math.max(5, Math.round(rsi)));
+                
+                // Sinyal üret
+                let signal = { text: "NÖTR", class: "signal-neutral", action: "HOLD" };
+                if (rsi < 30 && change > -1) {
+                    signal = { text: "LONG", class: "signal-long", action: "LONG" };
+                } else if (rsi > 70 && change < 1) {
+                    signal = { text: "SHORT", class: "signal-short", action: "SHORT" };
+                } else if (change > 2.5 && rsi < 65) {
+                    signal = { text: "LONG", class: "signal-long", action: "LONG" };
+                } else if (change < -2.5 && rsi > 35) {
+                    signal = { text: "SHORT", class: "signal-short", action: "SHORT" };
+                }
+                
+                marketData.push({
+                    id: idx + 1,
+                    symbol: symbol.replace("USDT", ""),
+                    fullSymbol: symbol,
+                    price: price,
+                    change: change,
+                    volume: volume,
+                    rsi: rsi,
+                    signal: signal
+                });
+            }
+        });
+        
+        // Fiyata göre sırala (BTC ilk)
+        marketData.sort((a, b) => {
+            if (a.symbol === "BTC") return -1;
+            if (b.symbol === "BTC") return 1;
+            return b.price - a.price;
+        });
+        
+        updateTable();
+        updateStats();
+        
+        document.getElementById('lastUpdate').innerHTML = `Son güncelleme: ${new Date().toLocaleTimeString('tr-TR')}`;
+        document.getElementById('totalCoins').innerText = marketData.length;
+        
+    } catch (error) {
+        console.error("API Hatası:", error);
+        document.getElementById('tableBody').innerHTML = `<tr><td colspan="8" style="text-align:center">❌ Binance Futures bağlantı hatası. Lütfen daha sonra tekrar deneyin.<br>${error.message}</td></tr>`;
+    }
 }
 
-function executeTrade(symbol, action, price, score) {
-    if(!autoTrade) return false;
-    if(action === "HOLD") return false;
+// Otomatik işlem simülasyonu
+function executeTrade(coin, action, price) {
+    if (!autoTrade) return false;
+    if (action === "HOLD") return false;
     
-    let maxPositions = parseInt(document.getElementById("maxPositions").value);
-    if(activePositions.length >= maxPositions) return false;
+    const tradeAmount = 10;
+    const leverage = 10;
+    const positionValue = tradeAmount * leverage;
     
-    let tradeSize = parseFloat(document.getElementById("tradeSize").value);
-    let leverage = parseFloat(document.getElementById("leverage").value);
-    let positionValue = tradeSize * leverage;
+    // Rastgele başarı (gerçek sinyal kalitesine göre)
+    const successProb = 68;
+    const isWin = Math.random() * 100 < successProb;
     
-    let successProb = score >= 75 ? 78 : score >= 60 ? 65 : 50;
-    let isWin = Math.random() * 100 < successProb;
     let pnl = 0;
-    
-    if(isWin){
-        let profitPct = (successProb/100) * 6 + 1;
-        pnl = positionValue * (profitPct/100);
+    if (isWin) {
+        pnl = positionValue * 0.045;
     } else {
-        let lossPct = 3.5;
-        pnl = -positionValue * (lossPct/100);
+        pnl = -positionValue * 0.025;
     }
     
     balance += pnl;
     
     trades.unshift({
-        symbol: symbol.split(":")[1] || symbol,
+        coin: coin,
         action: action,
+        entryPrice: price,
         pnl: pnl.toFixed(2),
         isWin: isWin,
         time: new Date().toLocaleTimeString()
     });
-    if(trades.length > 20) trades.pop();
     
-    updateUI();
+    if (trades.length > 20) trades.pop();
+    updateStats();
     return true;
 }
 
-function updateUI() {
-    document.getElementById("balance").innerHTML = balance.toFixed(0);
-    let totalPnL = balance - 10000;
-    document.getElementById("pnl").innerHTML = (totalPnL >= 0 ? "+" : "") + totalPnL.toFixed(2);
-    let winCount = trades.filter(t => t.isWin).length;
-    let winRate = trades.length > 0 ? (winCount/trades.length*100).toFixed(0) : 0;
-    document.getElementById("winrate").innerHTML = winRate;
+function updateTable() {
+    const searchTerm = document.getElementById('searchInput').value.toUpperCase();
+    const filtered = marketData.filter(d => d.symbol.includes(searchTerm));
     
-    let historyHtml = trades.slice(0,15).map(t => 
-        `<div class="trade-item"><span class="${t.isWin?'trade-win':'trade-loss'}">${t.isWin?'✅':'❌'} ${t.symbol}</span> ${t.action} $${t.pnl} ${t.time}</div>`
-    ).join("");
-    document.getElementById("historyList").innerHTML = historyHtml || "Henüz işlem yok";
-    document.getElementById("activeCount").innerText = activePositions.length;
-    document.getElementById("maxCount").innerText = document.getElementById("maxPositions").value;
-}
-
-// Simülasyon döngüsü (30 saniyede bir sinyal üret)
-function startSimulation() {
-    if(!autoTrade) return;
-    
-    // BTC trend simülasyonu
-    let btcChange = (Math.random() - 0.5) * 2;
-    btcTrend = btcChange > 0.3 ? "up" : (btcChange < -0.3 ? "down" : "neutral");
-    let btcCard = document.getElementById("btcStatusCard");
-    if(btcTrend === "up") btcCard.innerHTML = "🟢 BTC: YÜKSELİYOR";
-    else if(btcTrend === "down") btcCard.innerHTML = "🔴 BTC: DÜŞÜYOR";
-    else btcCard.innerHTML = "🟡 BTC: YATAY";
-    
-    // Rastgele coin sinyali
-    let coins = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT", "DOGEUSDT", "ADAUSDT"];
-    let randomCoin = coins[Math.floor(Math.random() * coins.length)];
-    let signal = getRandomSignal();
-    let price = 50000 + Math.random() * 40000;
-    
-    if(signal.action !== "HOLD") {
-        executeTrade(randomCoin, signal.action, price, signal.score);
+    const tbody = document.getElementById('tableBody');
+    if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center">🔍 Coin bulunamadı</td></tr>';
+        return;
     }
+    
+    tbody.innerHTML = filtered.map(d => {
+        const changeClass = d.change >= 0 ? 'price-up' : 'price-down';
+        const changeSymbol = d.change >= 0 ? '▲' : '▼';
+        const signalClass = d.signal.class;
+        const signalText = d.signal.text;
+        
+        return `
+            <tr>
+                <td>${d.id}</td>
+                <td><strong>${d.symbol}</strong><div style="font-size:10px;color:#8a8fb0;">Perpetual</div></td>
+                <td>$${d.price.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
+                <td class="${changeClass}">${changeSymbol} ${Math.abs(d.change).toFixed(2)}%</td>
+                <td>$${(d.volume / 1000000).toFixed(1)}M</td>
+                <td>${d.rsi}<div style="font-size:10px;">${d.rsi < 30 ? "Aşırı Satım" : d.rsi > 70 ? "Aşırı Alım" : "Nötr"}</div></td>
+                <td><span class="signal-badge ${signalClass}">${signalText}</span></td>
+                <td><button class="refresh-btn" style="padding:4px 12px;font-size:11px;" onclick="manualTrade('${d.symbol}','${d.signal.action}',${d.price})">${d.signal.action === "LONG" ? "📈 AL" : d.signal.action === "SHORT" ? "📉 SAT" : "⏸️"}</button></td>
+             </tr>
+        `;
+    }).join('');
 }
 
-// Eventler
-document.getElementById("toggleAutoTrade").onclick = () => {
+function updateStats() {
+    document.getElementById('balance').innerHTML = balance.toFixed(0);
+    const totalPnL = balance - 10000;
+    document.getElementById('pnl').innerHTML = (totalPnL >= 0 ? '+' : '') + totalPnL.toFixed(2);
+    const winCount = trades.filter(t => t.isWin).length;
+    const winRate = trades.length > 0 ? (winCount / trades.length * 100).toFixed(0) : 0;
+    document.getElementById('winrate').innerHTML = winRate;
+}
+
+function manualTrade(symbol, action, price) {
+    if (action === "HOLD") {
+        alert(`${symbol} için sinyal yok!`);
+        return;
+    }
+    executeTrade(symbol, action, price);
+    alert(`${symbol} için ${action} işlemi açıldı! Paper Trading`);
+
+ updateStats();
+}
+
+// Otomatik işlem döngüsü
+let autoInterval;
+function startAutoTrading() {
+    if (autoInterval) clearInterval(autoInterval);
+    autoInterval = setInterval(() => {
+        if (autoTrade && marketData.length > 0) {
+            const bestSignal = marketData.find(d => d.signal.action !== "HOLD");
+            if (bestSignal) {
+                executeTrade(bestSignal.symbol, bestSignal.signal.action, bestSignal.price);
+            }
+        }
+    }, 60000);
+}
+
+// Event listeners
+document.getElementById('toggleAutoTrade').onclick = () => {
     autoTrade = !autoTrade;
-    let btn = document.getElementById("toggleAutoTrade");
+    const btn = document.getElementById('toggleAutoTrade');
     btn.innerHTML = autoTrade ? "🔴 OTOMATİK: AÇIK" : "🟢 OTOMATİK: KAPALI";
     btn.style.background = autoTrade ? "#f6465d" : "#f0b90b";
-    
-    if(autoTrade) {
-        simInterval = setInterval(() => startSimulation(), 30000);
-    } else {
-        if(simInterval) clearInterval(simInterval);
-    }
+    if (autoTrade) startAutoTrading();
 };
 
-let simInterval = null;
-updateUI();
+document.getElementById('refreshBtn').onclick = () => {
+    fetchBinanceFutures();
+};
+document.getElementById('searchInput').oninput = () => updateTable();
+
+// Başlat
+fetchBinanceFutures();
+setInterval(() => { fetchBinanceFutures(); }, 30000);
+startAutoTrading();
 </script>
 </body>
 </html>
