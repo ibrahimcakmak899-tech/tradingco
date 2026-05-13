@@ -308,7 +308,35 @@
         setInterval(fetchRealData, 30000);
         startAutoLoop();
     })();
-</script>
+// ============ TELEGRAM BİLDİRİM ============
+const TG_TOKEN = "8604915778:AAEMgDz0xitgzgAgpvVMMsIwYBQfpnI-ovg";
+const TG_CHAT_ID = "919901623";
+
+async function sendToTelegram(message) {
+    try {
+        const url = `https://api.telegram.org/bot${TG_TOKEN}/sendMessage`;
+        await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: TG_CHAT_ID,
+                text: message,
+                parse_mode: 'HTML'
+            })
+        });
+        console.log("✅ Telegram mesajı gönderildi");
+    } catch(e) {
+        console.error("Telegram hatası:", e);
+    }
+}
+
+// Test fonksiyonu
+function testTGSinyal() {
+    sendToTelegram(`🟢 <b>TEST SİNYALİ</b>\n\n🪙 BTC/USDT\n💰 Fiyat: 61500$\n⚡ TradingCo Aktif`);
+}
+
+// Sayfa yüklendiğinde test sinyali gönder (opsiyonel)
+// testTGSinyal();</script>
 </body>
 </html>// ============ TELEGRAM BİLDİRİM ============
 const TG_TOKEN = "8604915778:AAEMgDz0xitgzgAgpvVMMsIwYBQfpnI-ovg";
