@@ -176,7 +176,13 @@ async function tgSignal(coin, action, price, tp, sl, strength, hasFVG) {
 }
 
 // ============ İŞLEM AÇMA ============
-function openTrade(coinSym, action, price, strength, hasFVG) {
+    // Aynı coine son 1 saatte işlem açıldı mı?
+    const now = Date.now();
+    const lastTrade = trades.find(t => t.coin === coinSym && (now - new Date(t.time).getTime()) < 3600000);
+    if (lastTrade) {
+        console.log(`${coinSym} için son 1 saatte işlem açıldı, atlandı.`);
+        return false;
+    }function openTrade(coinSym, action, price, strength, hasFVG) {
     if (!autoTrade) { alert("Önce 'OTOMATİK: AÇIK' yapın!"); return false; }
     if (action === "HOLD") { alert("Sinyal yok!"); return false; }
     const tradeAmount = 10, leverage = 10;
