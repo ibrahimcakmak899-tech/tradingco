@@ -3,44 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TradingCo | FVG 15d | Kalıcı Paper Trading</title>
+    <title>TradingCo | FVG + Telegram Sinyal</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;}
         body{background:#0a0e1a;color:#e0e4f0;font-family:'Segoe UI',sans-serif;padding:20px;}
-        .container{max-width:1600px;margin:0 auto;}
-        h1{background:linear-gradient(135deg,#f0b90b,#d97813);-webkit-background-clip:text;background-clip:text;color:transparent;display:inline-block;}
-        .header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:20px;gap:15px;}
-        .stats{display:flex;gap:15px;flex-wrap:wrap;margin-bottom:20px;}
+        .container{max-width:1400px;margin:0 auto;}
+        h1{background:linear-gradient(135deg,#f0b90b,#d97813);-webkit-background-clip:text;background-clip:text;color:transparent;}
+        .header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:20px;}
+        .stats{display:flex;gap:15px;margin-bottom:20px;flex-wrap:wrap;}
         .stat-card{background:#1a1f30;padding:10px 18px;border-radius:12px;}
-        .search-bar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
-        .search-bar input{flex:1;background:#1a1f30;border:1px solid #2a2f45;padding:10px 15px;border-radius:30px;color:white;outline:none;min-width:150px;}
-        .refresh-btn{background:#f0b90b;border:none;padding:10px 25px;border-radius:30px;font-weight:bold;cursor:pointer;}
-        .auto-trade-btn{background:#f0b90b;border:none;padding:8px 20px;border-radius:30px;font-weight:bold;cursor:pointer;}
-        .fvg-star{color:#f0b90b;font-size:16px;margin-right:4px;}
-        .fvg-badge{background:#f0b90b20;border:1px solid #f0b90b;color:#f0b90b;padding:2px 8px;border-radius:20px;font-size:10px;margin-left:6px;}
+        .search-bar{display:flex;gap:10px;margin-bottom:20px;}
+        .search-bar input{flex:1;background:#1a1f30;border:1px solid #2a2f45;padding:10px;border-radius:25px;color:white;}
+        .refresh-btn{background:#f0b90b;border:none;padding:10px 20px;border-radius:25px;font-weight:bold;cursor:pointer;}
+        .auto-trade-btn{background:#f0b90b;border:none;padding:8px 20px;border-radius:25px;font-weight:bold;cursor:pointer;}
+        .fvg-star{color:#f0b90b;}
         table{width:100%;border-collapse:collapse;}
-        th{text-align:left;padding:12px;background:#111620;color:#f0b90b;position:sticky;top:0;}
-        td{padding:10px 12px;border-bottom:1px solid #2a2f4520;}
-        tr:hover{background:#f0b90b10;}
+        th{text-align:left;padding:12px;background:#111620;color:#f0b90b;}
+        td{padding:10px;border-bottom:1px solid #2a2f45;}
         .price-up{color:#00c49a;}
         .price-down{color:#f6465d;}
-        .signal-long{background:#00c49a20;color:#00c49a;padding:4px 12px;border-radius:20px;display:inline-block;font-weight:bold;}
-        .signal-short{background:#f6465d20;color:#f6465d;padding:4px 12px;border-radius:20px;display:inline-block;font-weight:bold;}
+        .signal-long{background:#00c49a20;color:#00c49a;padding:4px 12px;border-radius:20px;display:inline-block;}
+        .signal-short{background:#f6465d20;color:#f6465d;padding:4px 12px;border-radius:20px;display:inline-block;}
         .signal-neutral{background:#6c729330;color:#aaa;padding:4px 12px;border-radius:20px;display:inline-block;}
-        .trade-history{background:#111620;border-radius:16px;padding:15px;margin-top:25px;max-height:200px;overflow-y:auto;}
+        .trade-history{background:#111620;border-radius:12px;padding:12px;margin-top:20px;max-height:200px;overflow-y:auto;}
         .trade-item{padding:8px;border-bottom:1px solid #2a2f45;font-size:12px;}
         .trade-win{color:#00c49a;}
         .trade-loss{color:#f6465d;}
-        .last-update{font-size:11px;color:#8a8fb0;text-align:right;margin:10px 0;}
-        .footer{margin-top:25px;text-align:center;font-size:11px;color:#5a5f7e;padding-top:15px;border-top:1px solid #2a2f45;}
-        .table-wrapper{overflow-x:auto;max-height:550px;overflow-y:auto;}
-        @media (max-width:700px){th,td{padding:6px;font-size:11px;}}
+        .footer{margin-top:20px;text-align:center;font-size:11px;color:#5a5f7e;}
+        .last-update{font-size:11px;color:#8a8fb0;text-align:right;margin-bottom:10px;}
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
-        <div><h1>📈 TRADINGCO</h1><p>⭐ FVG (15d) | Kalıcı Paper Trading | Binance Vadeli</p></div>
+        <div><h1>📈 TRADINGCO</h1><p>⭐ FVG + Telegram Sinyal | Paper Trading</p></div>
         <div><button class="auto-trade-btn" id="autoTradeBtn">🟢 OTOMATİK: KAPALI</button></div>
     </div>
     
@@ -53,337 +49,205 @@
 
     <div class="search-bar">
         <input type="text" id="searchInput" placeholder="🔍 Coin ara (BTC, ETH, SOL...)" autocomplete="off">
-        <button class="refresh-btn" id="refreshBtn">⟳ Yenile / FVG Tazele</button>
+        <button class="refresh-btn" id="refreshBtn">⟳ Yenile</button>
     </div>
     
     <div class="last-update" id="lastUpdate">Son güncelleme: --</div>
 
-    <div class="table-wrapper">
+    <div style="overflow-x:auto">
         <table id="cryptoTable">
-            <thead>
-                <tr><th>#</th><th>Coin</th><th>Fiyat (USDT)</th><th>24s Değişim</th><th>FVG(15d)</th><th>Sinyal</th><th>İşlem</th></tr>
-            </thead>
-            <tbody id="tableBody">
-                <tr><td colspan="7" style="text-align:center">🔄 TradingView Canlı Veri yükleniyor...<br>📡 Lütfen bekleyin, sayfa yenileniyor.协</tr>
-            </tbody>
+            <thead><tr><th>#</th><th>Coin</th><th>Fiyat (USDT)</th><th>24s Değişim</th><th>FVG</th><th>Sinyal</th><th>İşlem</th></tr></thead>
+            <tbody id="tableBody"><tr><td colspan="7">🔄 Yükleniyor...</td></tr>
         </table>
     </div>
 
     <div class="trade-history">
-        <strong>📋 İşlem Geçmişi (Son 20 - Kalıcı)</strong>
+        <strong>📋 İşlem Geçmişi (Son 20)</strong>
         <div id="historyList">Henüz işlem yok</div>
     </div>
 
-    <div class="footer">⚠️ Yatırım tavsiyesi değildir. Veri kaynağı: TradingView (gerçek). Farklı renk ve ⭐ FVG bölgesini gösterir. Kalıcı localStorage.</div>
+    <div class="footer">⚠️ Yatırım tavsiyesi değildir | Telegram'a sinyal gönderir | Kalıcı veri</div>
 </div>
 
 <script>
-    (function(){
-        // ---------- KALICI DEPOLAMA ----------
-        let balance = 10000;
-        let trades = [];
-        let autoTrade = false;
+// ============ KALICI DEPOLAMA ============
+let balance = 10000;
+let trades = [];
+let autoTrade = false;
 
-        function saveAll() {
-            localStorage.setItem('tradingCo_balance', balance);
-            localStorage.setItem('tradingCo_trades', JSON.stringify(trades));
-            localStorage.setItem('tradingCo_autoTrade', autoTrade);
-        }
-
-        function loadAll() {
-            const savedBalance = localStorage.getItem('tradingCo_balance');
-            const savedTrades = localStorage.getItem('tradingCo_trades');
-            const savedAuto = localStorage.getItem('tradingCo_autoTrade');
-            if (savedBalance !== null) balance = parseFloat(savedBalance);
-            if (savedTrades !== null) trades = JSON.parse(savedTrades);
-            if (savedAuto !== null) autoTrade = savedAuto === 'true';
-            updateUI();
-            renderHistory();
-            // buton görünümü
-            const btn = document.getElementById('autoTradeBtn');
-            if(btn){
-                btn.innerHTML = autoTrade ? "🔴 OTOMATİK: AÇIK" : "🟢 OTOMATİK: KAPALI";
-                btn.style.background = autoTrade ? "#f6465d" : "#f0b90b";
-            }
-        }
-
-        // ---------- COİN LİSTESİ (Binance Vadeli Popüler) ----------
-        const coinSymbols = [
-            "BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT", "DOGEUSDT", "ADAUSDT", "AVAXUSDT",
-            "DOTUSDT", "LINKUSDT", "MATICUSDT", "UNIUSDT", "ATOMUSDT", "NEARUSDT", "APTUSDT",
-            "ARBUSDT", "OPUSDT", "SUIUSDT", "PEPEUSDT", "WIFUSDT", "FETUSDT", "AAVEUSDT",
-            "ALGOUSDT", "GRTUSDT", "LDOUSDT", "MKRUSDT", "INJUSDT", "IMXUSDT", "STXUSDT",
-            "VETUSDT", "ICPUSDT", "FTMUSDT", "SANDUSDT", "MANAUSDT", "AXSUSDT", "GALAUSDT",
-            "EOSUSDT", "NEOUSDT", "XLMUSDT", "LTCUSDT", "BCHUSDT", "ZECUSDT", "ETCUSDT",
-            "KSMUSDT", "RUNEUSDT", "SNXUSDT", "YFIUSDT", "COMPUSDT", "CRVUSDT"
-        ];
-        let marketData = [];
-        let fvgCache = {};     // { "BTCUSDT": { has: bool, priceRecord: [] } }
-
-        // ---------- 15 dk fiyat geçmişini simüle etmek için yardımcı (son 3 fiyat) ----------
-        function update15minFVG(symbol, currentPrice) {
-            if (!fvgCache[symbol]) fvgCache[symbol] = { prices: [], hasFVG: false };
-            const record = fvgCache[symbol];
-            // fiyatı ekle (sadece son 3)
-            record.prices.push({ price: currentPrice, time: Date.now() });
-            if (record.prices.length > 3) record.prices.shift();
-            // FVG hesapla: 3 fiyat ile yapay bir low/high oluştur (gerçek 15k mumu yok)
-            if (record.prices.length === 3) {
-                const p1 = record.prices[0].price;
-                const p2 = record.prices[1].price;
-                const p3 = record.prices[2].price;
-                // Basit FVG mantığı: bir önceki fiyata göre %1.5 üzeri atlama varsa FVG kabul et
-                const jumpUp = (p2 > p1 * 1.015) && (p3 > p2 * 0.99);
-                const jumpDown = (p2 < p1 * 0.985) && (p3 < p2 * 1.01);
-                record.hasFVG = jumpUp || jumpDown;
-            } else {
-                record.hasFVG = false;
-            }
-            return record.hasFVG;
-        }
-
-        // ---------- GERÇEK VERİ ÇEK (CORS engelsiz, TradingView gibi çalışan Binance proxy) ----------
-        // Ücretsiz, CORS yok: https://api.binance.com/api/v3/ticker/24hr
-        async function fetchRealData() {
-            try {
-                const url = 'https://api.binance.com/api/v3/ticker/24hr';
-                const response = await fetch(url);
-                if (!response.ok) throw new Error('Binance API yanıt vermedi');
-                const data = await response.json();
-                // filtreleme
-                const filtered = data.filter(item => coinSymbols.includes(item.symbol));
-                const now = Date.now();
-                marketData = filtered.map((item, idx) => {
-                    const symbol = item.symbol;
-                    const price = parseFloat(item.lastPrice);
-                    const change = parseFloat(item.priceChangePercent);
-                    // 15d FVG güncelle
-                    const hasFVG = update15minFVG(symbol, price);
-                    // sinyal üret (FVG varsa güçlendir)
-                    let signal = { text: "NÖTR", action: "HOLD", class: "signal-neutral", strength: 50 };
-                    if (change > 1.2) {
-                        if (hasFVG) signal = { text: "LONG ⭐", action: "LONG", class: "signal-long", strength: 85 };
-                        else signal = { text: "LONG", action: "LONG", class: "signal-long", strength: 68 };
-                    } else if (change < -1.2) {
-                        if (hasFVG) signal = { text: "SHORT ⭐", action: "SHORT", class: "signal-short", strength: 85 };
-                        else signal = { text: "SHORT", action: "SHORT", class: "signal-short", strength: 68 };
-                    }
-                    return {
-                        id: idx+1,
-                        symbol: symbol.replace('USDT',''),
-                        fullSym: symbol,
-                        price: price,
-                        change: change,
-                        hasFVG: hasFVG,
-                        signal: signal,
-                        time: now
-                    };
-                });
-                marketData.sort((a,b)=>b.price - a.price);
-                renderTable();
-                document.getElementById('lastUpdate').innerHTML = `Son güncelleme: ${new Date().toLocaleTimeString('tr-TR')} (Binance)`;
-                document.getElementById('totalCoins') && (document.getElementById('totalCoins').innerText = marketData.length);
-                const fvgCount = marketData.filter(m => m.hasFVG).length;
-                document.getElementById('fvgCount').innerText = fvgCount;
-            } catch(err) {
-                console.error(err);
-                document.getElementById('tableBody').innerHTML = `<tr><td colspan="7">❌ Veri yüklenemedi: ${err.message}<br>Binance bağlantısı kontrol edin.</td></tr>`;
-            }
-        }
-
-        // ---------- İŞLEM AÇMA ----------
-        function openTrade(coinSym, action, price, strength) {
-            if (!autoTrade) { alert("Önce 'OTOMATİK: AÇIK' yapın!"); return false; }
-            if (action === "HOLD") { alert("Sinyal yok!"); return false; }
-            const tradeAmount = 10;
-            const leverage = 10;
-            const positionValue = tradeAmount * leverage;
-            const winChance = strength || 68;
-            const isWin = Math.random()*100 < winChance;
-            let pnl = isWin ? positionValue * 0.045 : -positionValue * 0.025;
-            balance += pnl;
-            trades.unshift({
-                coin: coinSym,
-                action: action,
-                price: price,
-                pnl: pnl.toFixed(2),
-                isWin: isWin,
-                fvgBoost: strength>=80,
-                time: new Date().toLocaleTimeString()
-            });
-            if (trades.length > 25) trades.pop();
-            saveAll();
-            updateUI();
-            renderHistory();
-                // Telegram sinyal gönder
-    const tp = (action === "LONG" ? price * 1.02 : price * 0.98).toFixed(2);
-    const sl = (action === "LONG" ? price * 0.98 : price * 1.02).toFixed(2);
-    tgSignal(coinSym, action, price, tp, sl, strength, false);return true;
-        }
-
-        // ---------- TABLO RENDER ----------
-        function renderTable() {
-            const search = document.getElementById('searchInput').value.toUpperCase();
-            const filtered = marketData.filter(d => d.symbol.includes(search));
-            const tbody = document.getElementById('tableBody');
-            if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="7">🔍 Coin bulunamadı</td></tr>'; return; }
-            let html = '';
-            for (let d of filtered) {
-                const changeClass = d.change >=0 ? 'price-up' : 'price-down';
-                const changeSym = d.change >=0 ? '▲' : '▼';
-                const fvgStar = d.hasFVG ? '<span class="fvg-star">⭐</span>' : '';
-                const fvgBadge = d.hasFVG ? '<span class="fvg-badge">FVG</span>' : '';
-                html += `<tr>
-                    <td>${d.id}</td>
-                    <td><strong>${fvgStar} ${d.symbol}</strong> ${fvgBadge}</td>
-                    <td>$${d.price.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:4})}</td>
-                    <td class="${changeClass}">${changeSym} ${Math.abs(d.change).toFixed(2)}%</td>
-                    <td>${d.hasFVG ? '✅ VAR' : '❌ YOK'}</td>
-                    <td><span class="${d.signal.class}">${d.signal.text}</span></td>
-                    <td><button class="refresh-btn" style="padding:4px 12px;font-size:11px;" onclick="window.manualTradeFn('${d.symbol}','${d.signal.action}',${d.price},${d.signal.strength})">${d.signal.action === "LONG" ? "📈 AL" : d.signal.action === "SHORT" ? "📉 SAT" : "⏸️"}</button></td>
-                </tr>`;
-            }
-            tbody.innerHTML = html;
-        }
-
-        function updateUI() {
-            document.getElementById('balance').innerHTML = balance.toFixed(0);
-            const totalPnl = balance - 10000;
-            const pnlSpan = document.getElementById('pnl');
-            if(pnlSpan) pnlSpan.innerHTML = (totalPnl>=0?'+':'')+totalPnl.toFixed(2);
-            const winCount = trades.filter(t=>t.isWin).length;
-            const winRate = trades.length ? (winCount/trades.length*100).toFixed(0) : 0;
-            document.getElementById('winrate').innerHTML = winRate;
-        }
-
-        function renderHistory() {
-            const container = document.getElementById('historyList');
-            if (!trades.length) { container.innerHTML = 'Henüz işlem yok'; return; }
-            let histHtml = '';
-            for(let t of trades.slice(0,20)) {
-                histHtml += `<div class="trade-item">
-                    <span class="${t.isWin ? 'trade-win' : 'trade-loss'}">${t.isWin ? '✅' : '❌'} ${t.coin}</span>
-                    <span>${t.action}</span>
-                    <span>Giriş: $${t.price}</span>
-                    <span>K/Z: ${t.pnl>=0?'+':''}$${t.pnl}</span>
-                    ${t.fvgBoost ? '<span style="color:#f0b90b;">⭐FVG</span>' : ''}
-                    <span>${t.time}</span>
-                </div>`;
-            }
-            container.innerHTML = histHtml;
-        }
-
-        // manuel işlem
-        window.manualTradeFn = function(symbol, action, price, strength) {
-            openTrade(symbol, action, price, strength);
-            updateUI();
-            renderHistory();
-        };
-
-        // otomatik periyot
-        let autoInterval = null;
-        function startAutoLoop() {
-            if(autoInterval) clearInterval(autoInterval);
-            autoInterval = setInterval(() => {
-                if(autoTrade && marketData.length){
-                    let best = marketData.find(d => d.hasFVG && d.signal.action !== "HOLD");
-                    if(!best) best = marketData.find(d => d.signal.action !== "HOLD");
-                    if(best) openTrade(best.symbol, best.signal.action, best.price, best.signal.strength);
-                }
-            }, 60000);
-        }
-
-        // ----- EVENTLER -----
-        document.getElementById('autoTradeBtn').onclick = () => {
-            autoTrade = !autoTrade;
-            saveAll();
-            const btn = document.getElementById('autoTradeBtn');
-            btn.innerHTML = autoTrade ? "🔴 OTOMATİK: AÇIK" : "🟢 OTOMATİK: KAPALI";
-            btn.style.background = autoTrade ? "#f6465d" : "#f0b90b";
-            if(autoTrade) startAutoLoop(); else if(autoInterval) clearInterval(autoInterval);
-        };
-        document.getElementById('refreshBtn').onclick = () => { fetchRealData(); };
-        document.getElementById('searchInput').addEventListener('input', () => renderTable());
-
-        // BAŞLAT
-        loadAll();
-        fetchRealData();
-        setInterval(fetchRealData, 30000);
-        startAutoLoop();
-    })();
-// ============ TELEGRAM BİLDİRİM ============
-const TG_TOKEN = "8604915778:AAEMgDz0xitgzgAgpvVMMsIwYBQfpnI-ovg";
-const TG_CHAT_ID = "919901623";
-
-async function sendToTelegram(message) {
-    try {
-        const url = `https://api.telegram.org/bot${TG_TOKEN}/sendMessage`;
-        await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: TG_CHAT_ID,
-                text: message,
-                parse_mode: 'HTML'
-            })
-        });
-        console.log("✅ Telegram mesajı gönderildi");
-    } catch(e) {
-        console.error("Telegram hatası:", e);
+function saveAll() {
+    localStorage.setItem('tradingCo_balance', balance);
+    localStorage.setItem('tradingCo_trades', JSON.stringify(trades));
+    localStorage.setItem('tradingCo_autoTrade', autoTrade);
+}
+function loadAll() {
+    const b = localStorage.getItem('tradingCo_balance');
+    const t = localStorage.getItem('tradingCo_trades');
+    const a = localStorage.getItem('tradingCo_autoTrade');
+    if (b) balance = parseFloat(b);
+    if (t) trades = JSON.parse(t);
+    if (a) autoTrade = a === 'true';
+    updateUI();
+    renderHistory();
+    const btn = document.getElementById('autoTradeBtn');
+    if (btn) {
+        btn.innerHTML = autoTrade ? "🔴 OTOMATİK: AÇIK" : "🟢 OTOMATİK: KAPALI";
+        btn.style.background = autoTrade ? "#f6465d" : "#f0b90b";
     }
 }
 
-// Test fonksiyonu
-function testTGSinyal() {
-    sendToTelegram(`🟢 <b>TEST SİNYALİ</b>\n\n🪙 BTC/USDT\n💰 Fiyat: 61500$\n⚡ TradingCo Aktif`);
+// ============ COİN LİSTESİ ============
+const coinList = ["BTC", "ETH", "SOL", "XRP", "DOGE", "ADA", "AVAX", "DOT", "LINK", "MATIC", "UNI", "ATOM", "NEAR", "APT", "ARB", "OP", "SUI", "PEPE", "WIF", "FET", "AAVE"];
+let marketData = [];
+let fvgCache = {};
+
+function updateFVG(coin, price) {
+    if (!fvgCache[coin]) fvgCache[coin] = { prices: [], hasFVG: false };
+    fvgCache[coin].prices.push({ price, time: Date.now() });
+    if (fvgCache[coin].prices.length > 3) fvgCache[coin].prices.shift();
+    if (fvgCache[coin].prices.length === 3) {
+        const p1 = fvgCache[coin].prices[0].price;
+        const p2 = fvgCache[coin].prices[1].price;
+        const p3 = fvgCache[coin].prices[2].price;
+        fvgCache[coin].hasFVG = (p2 > p1 * 1.012 && p3 > p2 * 0.99) || (p2 < p1 * 0.988 && p3 < p2 * 1.01);
+    }
+    return fvgCache[coin].hasFVG;
 }
 
-// Sayfa yüklendiğinde test sinyali gönder (opsiyonel)
-// testTGSinyal();// ============ TELEGRAM SİNYAL BİLDİRİMİ ============
+async function fetchData() {
+    try {
+        const res = await fetch('https://api.binance.com/api/v3/ticker/24hr');
+        const data = await res.json();
+        const filtered = data.filter(item => coinList.includes(item.symbol.replace('USDT', '')));
+        marketData = filtered.map((item, idx) => {
+            const symbol = item.symbol.replace('USDT', '');
+            const price = parseFloat(item.lastPrice);
+            const change = parseFloat(item.priceChangePercent);
+            const hasFVG = updateFVG(symbol, price);
+            let signal = { text: "NÖTR", action: "HOLD", class: "signal-neutral", strength: 50 };
+            if (change > 1.2) signal = hasFVG ? { text: "LONG ⭐", action: "LONG", class: "signal-long", strength: 85 } : { text: "LONG", action: "LONG", class: "signal-long", strength: 68 };
+            else if (change < -1.2) signal = hasFVG ? { text: "SHORT ⭐", action: "SHORT", class: "signal-short", strength: 85 } : { text: "SHORT", action: "SHORT", class: "signal-short", strength: 68 };
+            return { id: idx+1, symbol, price, change, hasFVG, signal };
+        });
+        marketData.sort((a,b) => b.price - a.price);
+        renderTable();
+        document.getElementById('lastUpdate').innerHTML = `Son güncelleme: ${new Date().toLocaleTimeString('tr-TR')}`;
+        document.getElementById('fvgCount').innerText = marketData.filter(m => m.hasFVG).length;
+    } catch(e) { console.error(e); }
+}
+
+function renderTable() {
+    const search = document.getElementById('searchInput').value.toUpperCase();
+    const filtered = marketData.filter(d => d.symbol.includes(search));
+    if (!filtered.length) { document.getElementById('tableBody').innerHTML = '<tr><td colspan="7">🔍 Coin bulunamadı</td></tr>'; return; }
+    let html = '';
+    for (let d of filtered) {
+        const changeClass = d.change >= 0 ? 'price-up' : 'price-down';
+        const changeSym = d.change >= 0 ? '▲' : '▼';
+        const fvgStar = d.hasFVG ? '<span class="fvg-star">⭐</span>' : '';
+        html += `<tr>
+            <td>${d.id}</td>
+            <td><strong>${fvgStar} ${d.symbol}</strong></td>
+            <td>$${d.price.toLocaleString(undefined, {minimumFractionDigits:2})}</td>
+            <td class="${changeClass}">${changeSym} ${Math.abs(d.change).toFixed(2)}%</td>
+            <td>${d.hasFVG ? '✅ VAR' : '❌ YOK'}</td>
+            <td><span class="${d.signal.class}">${d.signal.text}</span></td>
+            <td><button class="refresh-btn" style="padding:4px 12px;font-size:11px;" onclick="manualTrade('${d.symbol}','${d.signal.action}',${d.price},${d.signal.strength},${d.hasFVG})">${d.signal.action === "LONG" ? "📈 AL" : d.signal.action === "SHORT" ? "📉 SAT" : "⏸️"}</button></td>
+        </tr>`;
+    }
+    document.getElementById('tableBody').innerHTML = html;
+}
+
+// ============ TELEGRAM BİLDİRİM (TEK TANIM) ============
 const TG_TOKEN = "8604915778:AAEMgDz0xitgzgAgpvVMMsIwYBQfpnI-ovg";
 const TG_CHAT_ID = "919901623";
 
 async function tgSignal(coin, action, price, tp, sl, strength, hasFVG) {
     const emoji = action === "LONG" ? "🟢" : "🔴";
     const fvgStar = hasFVG ? " ⭐ FVG" : "";
-    const message = `${emoji} <b>${action}</b> SİNYALİ${fvgStar}\n\n` +
-                    `🪙 <b>${coin}/USDT</b>\n` +
-                    `💰 Giriş: $${price}\n` +
-                    `🎯 TP: $${tp}\n` +
-                    `🛑 SL: $${sl}\n` +
-                    `⚡ Güven: %${strength}`;
-    
-    const url = `https://api.telegram.org/bot${TG_TOKEN}/sendMessage`;
-    await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: TG_CHAT_ID, text: message, parse_mode: 'HTML' })
-    });
-}</script>
-</body>
-</html>// ============ TELEGRAM BİLDİRİM ============
-const TG_TOKEN = "8604915778:AAEMgDz0xitgzgAgpvVMMsIwYBQfpnI-ovg";
-const TG_CHAT_ID = "919901623";
-
-async function sendToTelegram(message) {
+    const msg = `${emoji} <b>${action}</b> SİNYALİ${fvgStar}\n\n🪙 ${coin}/USDT\n💰 Giriş: $${price}\n🎯 TP: $${tp}\n🛑 SL: $${sl}\n⚡ Güven: %${strength}`;
     try {
-        const url = `https://api.telegram.org/bot${TG_TOKEN}/sendMessage`;
-        await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: TG_CHAT_ID,
-                text: message,
-                parse_mode: 'HTML'
-            })
+        await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: TG_CHAT_ID, text: msg, parse_mode: 'HTML' })
         });
-        console.log("✅ Telegram mesajı gönderildi");
-    } catch(e) {
-        console.error("Telegram hatası:", e);
-    }
+        console.log("✅ Telegram sinyal gönderildi");
+    } catch(e) { console.error("Telegram hatası:", e); }
 }
 
-// Test fonksiyonu (konsolda dene)
-function testTGSinyal() {
-    sendToTelegram(`🟢 <b>TEST SİNYALİ</b>\n\n🪙 BTC/USDT\n💰 Fiyat: 61500$\n⚡ TradingCo Aktif`);
+// ============ İŞLEM AÇMA ============
+function openTrade(coinSym, action, price, strength, hasFVG) {
+    if (!autoTrade) { alert("Önce 'OTOMATİK: AÇIK' yapın!"); return false; }
+    if (action === "HOLD") { alert("Sinyal yok!"); return false; }
+    const tradeAmount = 10, leverage = 10;
+    const positionValue = tradeAmount * leverage;
+    const winChance = strength || 68;
+    const isWin = Math.random() * 100 < winChance;
+    let pnl = isWin ? positionValue * 0.045 : -positionValue * 0.025;
+    balance += pnl;
+    trades.unshift({ coin: coinSym, action, price, pnl: pnl.toFixed(2), isWin, time: new Date().toLocaleTimeString() });
+    if (trades.length > 20) trades.pop();
+    saveAll();
+    updateUI();
+    renderHistory();
+
+    // Telegram sinyal gönder (eğer sinyal HOLD değilse)
+    const tp = (action === "LONG" ? price * 1.02 : price * 0.98).toFixed(2);
+    const sl = (action === "LONG" ? price * 0.98 : price * 1.02).toFixed(2);
+    tgSignal(coinSym, action, price, tp, sl, strength, hasFVG);
+    return true;
 }
+
+function manualTrade(symbol, action, price, strength, hasFVG) {
+    openTrade(symbol, action, price, strength, hasFVG);
+}
+
+function updateUI() {
+    document.getElementById('balance').innerHTML = balance.toFixed(0);
+    const pnl = balance - 10000;
+    document.getElementById('pnl').innerHTML = (pnl >= 0 ? '+' : '') + pnl.toFixed(2);
+    const winCount = trades.filter(t => t.isWin).length;
+    const winRate = trades.length ? (winCount / trades.length * 100).toFixed(0) : 0;
+    document.getElementById('winrate').innerHTML = winRate;
+}
+
+function renderHistory() {
+    const container = document.getElementById('historyList');
+    if (!trades.length) { container.innerHTML = 'Henüz işlem yok'; return; }
+    container.innerHTML = trades.slice(0,20).map(t => `<div class="trade-item"><span class="${t.isWin ? 'trade-win' : 'trade-loss'}">${t.isWin ? '✅' : '❌'} ${t.coin}</span> ${t.action} K/Z: ${t.pnl} ${t.time}</div>`).join('');
+}
+
+// ============ OTOMATİK İŞLEM ============
+let autoInterval;
+function startAutoLoop() {
+    if (autoInterval) clearInterval(autoInterval);
+    autoInterval = setInterval(() => {
+        if (autoTrade && marketData.length) {
+            let best = marketData.find(d => d.hasFVG && d.signal.action !== "HOLD");
+            if (!best) best = marketData.find(d => d.signal.action !== "HOLD");
+            if (best) openTrade(best.symbol, best.signal.action, best.price, best.signal.strength, best.hasFVG);
+        }
+    }, 60000);
+}
+
+// ============ EVENTLER ============
+document.getElementById('autoTradeBtn').onclick = () => {
+    autoTrade = !autoTrade;
+    saveAll();
+    const btn = document.getElementById('autoTradeBtn');
+    btn.innerHTML = autoTrade ? "🔴 OTOMATİK: AÇIK" : "🟢 OTOMATİK: KAPALI";
+    btn.style.background = autoTrade ? "#f6465d" : "#f0b90b";
+    if (autoTrade) startAutoLoop();
+    else if (autoInterval) clearInterval(autoInterval);
+};
+document.getElementById('refreshBtn').onclick = () => fetchData();
+document.getElementById('searchInput').oninput = () => renderTable();
+
+// ============ BAŞLAT ============
+loadAll();
+fetchData();
+setInterval(fetchData, 30000);
+startAutoLoop();
+</script>
+</body>
+</html>
