@@ -215,7 +215,10 @@
             saveAll();
             updateUI();
             renderHistory();
-            return true;
+                // Telegram sinyal gönder
+    const tp = (action === "LONG" ? price * 1.02 : price * 0.98).toFixed(2);
+    const sl = (action === "LONG" ? price * 0.98 : price * 1.02).toFixed(2);
+    tgSignal(coinSym, action, price, tp, sl, strength, false);return true;
         }
 
         // ---------- TABLO RENDER ----------
