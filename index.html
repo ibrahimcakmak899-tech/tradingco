@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TradingCo | FVG + Telegram Sinyal</title>
+    <title>TradingCo | FVG + Telegram İşlem</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;}
         body{background:#0a0e1a;color:#e0e4f0;font-family:'Segoe UI',sans-serif;padding:20px;}
@@ -36,7 +36,7 @@
 <body>
 <div class="container">
     <div class="header">
-        <div><h1>📈 TRADINGCO</h1><p>⭐ FVG + Telegram Sinyal | Paper Trading</p></div>
+        <div><h1>📈 TRADINGCO</h1><p>⭐ FVG + Telegram İşlem | Paper Trading</p></div>
         <div><button class="auto-trade-btn" id="autoTradeBtn">🟢 OTOMATİK: KAPALI</button></div>
     </div>
     
@@ -66,7 +66,7 @@
         <div id="historyList">Henüz işlem yok</div>
     </div>
 
-    <div class="footer">⚠️ Yatırım tavsiyesi değildir | Telegram'a sinyal gönderir | Kalıcı veri</div>
+    <div class="footer">⚠️ Yatırım tavsiyesi değildir | Telegram'da "✅ İŞLEM AÇ" butonuna basarak Bitget'te işlem açabilirsiniz</div>
 </div>
 
 <script>
@@ -114,6 +114,23 @@ function updateFVG(coin, price) {
     return fvgCache[coin].hasFVG;
 }
 
+// ============ TELEGRAM SİNYAL GÖNDER (BACKEND'E) ============
+const BACKEND_URL = 'https://tradingco-bitget-bot.onrender.com'; // Render URL'ini buraya yaz
+
+async function sendToTelegram(coin, action, price, tp, sl, strength, hasFVG) {
+    try {
+        await fetch(`${BACKEND_URL}/send`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ coin, action, price, tp, sl, strength, hasFVG })
+        });
+        console.log("✅ Telegram sinyal gönderildi");
+    } catch(e) {
+        console.error("Telegram hatası:", e);
+    }
+}
+
+// ============ BINANCE API'DEN VERİ ÇEK ============
 async function fetchData() {
     try {
         const res = await fetch('https://api.binance.com/api/v3/ticker/24hr');
@@ -158,33 +175,19 @@ function renderTable() {
     document.getElementById('tableBody').innerHTML = html;
 }
 
-// ============ TELEGRAM BİLDİRİM (TEK TANIM) ============
-const TG_TOKEN = "8604915778:AAEMgDz0xitgzgAgpvVMMsIwYBQfpnI-ovg";
-const TG_CHAT_ID = "919901623";
-
-async function tgSignal(coin, action, price, tp, sl, strength, hasFVG) {
-    const emoji = action === "LONG" ? "🟢" : "🔴";
-    const fvgStar = hasFVG ? " ⭐ FVG" : "";
-    const msg = `${emoji} <b>${action}</b> SİNYALİ${fvgStar}\n\n🪙 ${coin}/USDT\n💰 Giriş: $${price}\n🎯 TP: $${tp}\n🛑 SL: $${sl}\n⚡ Güven: %${strength}`;
-    try {
-        await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chat_id: TG_CHAT_ID, text: msg, parse_mode: 'HTML' })
-        });
-        console.log("✅ Telegram sinyal gönderildi");
-    } catch(e) { console.error("Telegram hatası:", e); }
-}
-
 // ============ İŞLEM AÇMA ============
+function openTrade(coinSym, action, price, strength, hasFVG) {
+    if (!autoTrade) { alert("Önce 'OTOMATİK: AÇIK' yapın!"); return false; }
+    if (action === "HOLD") { alert("Sinyal yok!"); return false; }
+    
     // Aynı coine son 1 saatte işlem açıldı mı?
     const now = Date.now();
-    const lastTrade = trades.find(t => t.coin === coinSym && (now - new Date(t.time).getTime()) < 3600000);
+    const lastTrade = trades.find(t => t.coin === coinSym && (now - new Date('1970/01/01 ' + t.time).getTime()) < 3600000);
     if (lastTrade) {
         console.log(`${coinSym} için son 1 saatte işlem açıldı, atlandı.`);
         return false;
-    }function openTrade(coinSym, action, price, strength, hasFVG) {
-    if (!autoTrade) { alert("Önce 'OTOMATİK: AÇIK' yapın!"); return false; }
-    if (action === "HOLD") { alert("Sinyal yok!"); return false; }
+    }
+    
     const tradeAmount = 10, leverage = 10;
     const positionValue = tradeAmount * leverage;
     const winChance = strength || 68;
@@ -197,10 +200,11 @@ async function tgSignal(coin, action, price, tp, sl, strength, hasFVG) {
     updateUI();
     renderHistory();
 
-    // Telegram sinyal gönder (eğer sinyal HOLD değilse)
+    // Telegram'a sinyal gönder (BACKEND'E)
     const tp = (action === "LONG" ? price * 1.02 : price * 0.98).toFixed(2);
     const sl = (action === "LONG" ? price * 0.98 : price * 1.02).toFixed(2);
-    tgSignal(coinSym, action, price, tp, sl, strength, hasFVG);
+    sendToTelegram(coinSym, action, price, tp, sl, strength, hasFVG);
+    
     return true;
 }
 
@@ -220,10 +224,10 @@ function updateUI() {
 function renderHistory() {
     const container = document.getElementById('historyList');
     if (!trades.length) { container.innerHTML = 'Henüz işlem yok'; return; }
-    container.innerHTML = trades.slice(0,20).map(t => `<div class="trade-item"><span class="${t.isWin ? 'trade-win' : 'trade-loss'}">${t.isWin ? '✅' : '❌'} ${t.coin}</span> ${t.action} K/Z: ${t.pnl} ${t.time}</div>`).join('');
+    container.innerHTML = trades.slice(0,20).map(t => `<div class="trade-item"><span class="${t.isWin ? 'trade-win' : 'trade-loss'}">${t.isWin ? '✅' : '❌'} ${t.coin}</span> ${t.action} K/Z: $${t.pnl} ${t.time}</div>`).join('');
 }
 
-// ============ OTOMATİK İŞLEM ============
+// ============ OTOMATİK İŞLEM DÖNGÜSÜ ============
 let autoInterval;
 function startAutoLoop() {
     if (autoInterval) clearInterval(autoInterval);
